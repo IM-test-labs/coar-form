@@ -16,7 +16,7 @@ window.COAR_CONFIG = {
 
   // 4. Address of each country office's view, ending in /FeatureServer/0 (Phase 3)
   //    Leave a country empty ("") until its view exists.
-  COUNTRY_LAYER_URLS: {https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/COAR_Lao_PDR/FeatureServer/0}
+  COUNTRY_LAYER_URLS: {https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/COAR_Lao_PDR/FeatureServer/0
     "afghanistan":             "",   // Afghanistan
     "angola":                  "",   // Angola
     "bosnia_and_herzegovina":  "",   // Bosnia and Herzegovina
