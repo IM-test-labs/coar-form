@@ -12,11 +12,11 @@ window.COAR_CONFIG = {
   CLIENT_ID: "lvOneQgNzRxoGURs",
 
   // 3. Address of the main survey layer, ending in /FeatureServer/0 (Phase 2)
-  LAYER_URL: "https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/service_0d39635c0c4c4dc59ff57210496fde2f/FeatureServer/0",
+  LAYER_URL: "https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/service_f50aeb0340a547b6935aae9ddeac652c/FeatureServer/0",
 
   // 4. Address of each country office's view, ending in /FeatureServer/0 (Phase 3)
   //    Leave a country empty ("") until its view exists.
-  COUNTRY_LAYER_URLS: "https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/COAR_Lao_PDR/FeatureServer/0",
+  COUNTRY_LAYER_URLS: {
     "afghanistan":             "",   // Afghanistan
     "angola":                  "",   // Angola
     "bosnia_and_herzegovina":  "",   // Bosnia and Herzegovina
@@ -26,7 +26,7 @@ window.COAR_CONFIG = {
     "ethiopia":                "",   // Ethiopia
     "iraq":                    "",   // Iraq
     "kosovo":                  "",   // Kosovo
-    "lao_pdr":                 "",   // Lao PDR
+    "lao_pdr":                 "https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/COAR_Lao_PDR/FeatureServer/0",   // Lao PDR
     "lebanon":                 "",   // Lebanon
     "mozambique":              "",   // Mozambique
     "myanmar":                 "",   // Myanmar

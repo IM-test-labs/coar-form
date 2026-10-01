@@ -178,7 +178,7 @@ a.doc:hover{border-color:var(--accent);color:var(--accent)}
 <main class="wrap" id="app"></main>
 <div class="toast" id="toast" hidden></div>
 
-<script src="config.js"></script>
+<script>window.COAR_EXPECT_CONFIG = true; document.write('<script src="config.js?t=' + Date.now() + '" onerror="window.COAR_CONFIG_MISSING = true"><\/script>');</script>
 <script>
 /* ================= CONFIGURATION =================
    The settings live in a separate file, config.js, next to this page (see the setup guide).
@@ -593,6 +593,11 @@ function bindForm(){
 
 /* ================= BOOT ================= */
 async function boot(){
+  if (window.COAR_EXPECT_CONFIG && !window.COAR_CONFIG) {
+    $app().innerHTML = `<div class="card"><div><div class="eyebrow">Setup problem</div><h1>The settings file could not be read</h1></div>
+      <p>${window.COAR_CONFIG_MISSING ? "config.js was not found next to this page. Check that a file named exactly <b>config.js</b> (all lowercase, not config (1).js or config.js.txt) is in the same place as index.html on GitHub." : "config.js was found but contains a typing error, so it could not be read. Check that no quote marks, commas or brackets were removed or added, or upload a fresh copy."}</p></div>`;
+    return;
+  }
   if (DEMO) {
     document.getElementById("demo-chip").hidden = false;
     APP.user = {name:"Demo user", email:"", username:"demo"};
