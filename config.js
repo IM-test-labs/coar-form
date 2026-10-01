@@ -6,17 +6,17 @@
 window.COAR_CONFIG = {
 
   // 1. Your organisation's ArcGIS Online address (from your browser's address bar when signed in)
-  PORTAL_URL: "https://yourorg.maps.arcgis.com",
+  PORTAL_URL: "https://npaid.maps.arcgis.com",
 
   // 2. Client ID of the sign-in app you registered in ArcGIS Online (Phase 4)
-  CLIENT_ID: "",
+  CLIENT_ID: "lvOneQgNzRxoGURs",
 
   // 3. Address of the main survey layer, ending in /FeatureServer/0 (Phase 2)
-  LAYER_URL: "",
+  LAYER_URL: "https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/service_0d39635c0c4c4dc59ff57210496fde2f/FeatureServer/0",
 
   // 4. Address of each country office's view, ending in /FeatureServer/0 (Phase 3)
   //    Leave a country empty ("") until its view exists.
-  COUNTRY_LAYER_URLS: {
+  COUNTRY_LAYER_URLS: {https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/COAR_Lao_PDR/FeatureServer/0}
     "afghanistan":             "",   // Afghanistan
     "angola":                  "",   // Angola
     "bosnia_and_herzegovina":  "",   // Bosnia and Herzegovina
