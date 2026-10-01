@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CO Annual Requirements</title>
+<style>html{color-scheme:light}body{margin:0}[hidden]{display:none!important}</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: top bar with save status; start screen card; form = section rail + question cards with traffic-light boxes */
+:root{
+  --bg:#f3f5f6; --surface:#ffffff; --surface-2:#eef1f3; --line:#d9dfe3; --fg:#1c2529; --muted:#5d6b72;
+  --accent:#1f4e5f; --accent-fg:#ffffff; --accent-soft:#e2ecef;
+  --red:#c8372d; --red-soft:#f8e1de; --amber:#d99a00; --amber-soft:#fbf0d2; --green:#2e8540; --green-soft:#dff0e2;
+  --na:#8a979d; --na-soft:#e7eaec; --empty:#eceff1; --amber-fg:#2b2100; --on-solid:#ffffff;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:8px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12181b; --surface:#1a2226; --surface-2:#222c31; --line:#314047; --fg:#e4eaec; --muted:#9aa9b0;
+  --accent:#7fb3c4; --accent-fg:#0e1417; --accent-soft:#1f3139;
+  --red:#e0584d; --red-soft:#3a1f1c; --amber:#e9b132; --amber-soft:#3a3018; --green:#4fae62; --green-soft:#1c3322;
+  --na:#6f7c82; --na-soft:#2a3337; --empty:#232c30; --amber-fg:#1b1500; --on-solid:#0e1417; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12181b; --surface:#1a2226; --surface-2:#222c31; --line:#314047; --fg:#e4eaec; --muted:#9aa9b0;
+  --accent:#7fb3c4; --accent-fg:#0e1417; --accent-soft:#1f3139;
+  --red:#e0584d; --red-soft:#3a1f1c; --amber:#e9b132; --amber-soft:#3a3018; --green:#4fae62; --green-soft:#1c3322;
+  --na:#6f7c82; --na-soft:#2a3337; --empty:#232c30; --amber-fg:#1b1500; --on-solid:#0e1417; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.25}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-size:.82em}
+.eyebrow{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.muted{color:var(--muted)}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--accent);color:var(--accent-fg)}
+.top-in{max-width:1320px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;margin-right:auto;min-width:0}
+.brand b{font-size:1.02rem}
+.brand span{font-size:.78rem;opacity:.85}
+.savest{display:flex;align-items:center;gap:7px;font-size:.82rem;background:rgba(0,0,0,.18);padding:5px 11px;border-radius:99px;white-space:nowrap}
+.savest i{width:9px;height:9px;border-radius:50%;background:#7fd48f;display:inline-block}
+.savest[data-s="saving"] i{background:#f3d36b}
+.savest[data-s="offline"] i,.savest[data-s="error"] i{background:#ff8a80}
+.who{font-size:.8rem;opacity:.9;white-space:nowrap}
+.linkbtn{background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer;font-size:.8rem;padding:0}
+.demo-chip{font-size:.72rem;border:1px solid currentColor;border-radius:99px;padding:2px 8px;white-space:nowrap}
+
+.wrap{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:20px 60px}
+.card{background:var(--surface);border:1px solid var(--line);border-top:6px solid var(--accent);border-radius:var(--r);padding:24px;max-width:680px;margin:24px auto;display:grid;gap:16px}
+.card h1{font-size:1.4rem}
+.card p{margin:0;color:var(--muted)}
+.grid3{display:grid;grid-template-columns:2fr 1fr 1.4fr;gap:12px}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld label{font-size:.78rem;font-weight:600;color:var(--muted)}
+.fld input,.fld select,.fld textarea{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;min-width:0}
+.fld textarea{min-height:70px;resize:vertical}
+.fld input:disabled,.fld select:disabled{background:var(--surface-2)}
+.btn{border:1px solid var(--line);background:var(--surface);padding:9px 16px;border-radius:6px;cursor:pointer;font-weight:600}
+.btn.pri{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.btn.danger{background:var(--red);border-color:var(--red);color:var(--on-solid)}
+.btn:disabled{opacity:.45;cursor:default}
+.note{font-size:.86rem;border-radius:6px;padding:10px 14px;background:var(--accent-soft)}
+.note.warn{background:var(--amber-soft)}
+.note.err{background:var(--red-soft)}
+.note.ok{background:var(--green-soft)}
+
+.form-grid{display:grid;grid-template-columns:280px minmax(0,1fr);gap:20px;align-items:start}
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px;max-height:calc(100vh - 100px);overflow:auto}
+.rail h3{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:8px 10px 6px}
+.rail button{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 8px;width:100%;text-align:left;border:0;background:transparent;padding:8px 10px;border-radius:6px;cursor:pointer}
+.rail button:hover{background:var(--surface-2)}
+.rail button[aria-current="true"]{background:var(--accent-soft)}
+.rail .nm{font-size:.85rem;font-weight:500;min-width:0}
+.rail .ct{font-size:.74rem;color:var(--muted);font-variant-numeric:tabular-nums;align-self:center}
+.minibar,.stack{display:flex;border-radius:2px;overflow:hidden;background:var(--empty)}
+.minibar{grid-column:1/-1;height:4px}
+.stack{height:12px;border-radius:3px}
+.minibar i,.stack i{display:block;height:100%}
+.rail-sel.fld{display:none}
+
+.hero{background:var(--surface);border:1px solid var(--line);border-top:6px solid var(--accent);border-radius:var(--r);padding:18px 22px;display:grid;gap:12px}
+.hero-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:start}
+.hero h1{font-size:1.35rem}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.82rem}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block;flex:none}
+.progress{display:flex;align-items:center;gap:12px;font-size:.84rem;color:var(--muted)}
+.progress .bar{flex:1;height:8px;background:var(--empty);border-radius:4px;overflow:hidden}
+.progress .bar i{display:block;height:100%;background:var(--accent);transition:width .25s}
+
+.sec-head{margin:24px 0 12px;display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sec-head h2{font-size:1.25rem}
+.edited{font-size:.8rem;color:var(--muted)}
+.sub-h{margin:22px 0 8px;font-size:.9rem;font-weight:700;color:var(--accent)}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:grid;gap:10px;margin-bottom:10px;border-left:5px solid var(--line)}
+.q[data-s="1"]{border-left-color:var(--red)}
+.q[data-s="2"]{border-left-color:var(--amber)}
+.q[data-s="3"]{border-left-color:var(--green)}
+.q[data-s="na"]{border-left-color:var(--na)}
+.q-top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.q-id{color:var(--muted);flex:none}
+.q-text{font-weight:600;max-width:80ch;flex:1;min-width:0}
+.prev{font-size:.74rem;color:var(--muted);white-space:nowrap}
+.hint{font-size:.84rem;color:var(--muted)}
+.docs{display:flex;flex-wrap:wrap;gap:6px}
+.doc{font-size:.78rem;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);text-decoration:none;color:var(--fg);max-width:100%}
+a.doc:hover{border-color:var(--accent);color:var(--accent)}
+.doc.gap{background:transparent;border-style:dashed;color:var(--muted)}
+.doc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(70px,auto);gap:8px}
+.ch{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 10px;cursor:pointer;display:flex;align-items:center;gap:9px;text-align:left;min-width:0}
+.ch b{font-size:1rem;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--surface-2)}
+.ch small{font-size:.82rem;line-height:1.2}
+.ch:hover:not(:disabled){border-color:var(--muted)}
+.ch:disabled{cursor:default}
+.ch[data-v="1"][aria-pressed="true"]{border-color:var(--red);background:var(--red);color:var(--on-solid)}
+.ch[data-v="2"][aria-pressed="true"]{border-color:var(--amber);background:var(--amber);color:var(--amber-fg)}
+.ch[data-v="3"][aria-pressed="true"]{border-color:var(--green);background:var(--green);color:var(--on-solid)}
+.ch[aria-pressed="true"] b{background:rgba(255,255,255,.28)}
+.ch[data-v="na"]{justify-content:center}
+.ch[data-v="na"][aria-pressed="true"]{border-color:var(--na);background:var(--na);color:var(--on-solid)}
+.follow{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1.6fr) minmax(0,1.1fr) minmax(0,.9fr);gap:10px;background:var(--surface-2);border-radius:6px;padding:10px 12px}
+.follow.one{grid-template-columns:minmax(0,1fr)}
+.req{color:var(--red)}
+.nav-btns{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
+
+.review{display:grid;gap:8px}
+.rv-row{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,2fr) 110px;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:600;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.pill.r{background:var(--red-soft);color:var(--red)}
+.pill.a{background:var(--amber-soft);color:var(--amber)}
+.pill.g{background:var(--green-soft);color:var(--green)}
+.pill.n{background:var(--na-soft);color:var(--muted)}
+.jump{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;cursor:pointer;font-family:var(--f-mono);font-size:.8rem}
+.confirm{display:grid;gap:10px;border:2px solid var(--accent);border-radius:8px;padding:14px;background:var(--surface)}
+.demo-bar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:.8rem;background:var(--surface);border:1px dashed var(--line);border-radius:6px;padding:8px 12px;margin-bottom:14px;color:var(--muted)}
+.demo-bar label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:8px;font-size:.88rem;z-index:50;max-width:calc(100% - 32px)}
+
+@media (max-width:980px){
+  .form-grid{grid-template-columns:minmax(0,1fr)}
+  .rail{display:none}
+  .rail-sel.fld{display:flex;margin-top:14px}
+  .follow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+}
+@media (max-width:620px){
+  .grid3{grid-template-columns:minmax(0,1fr)}
+  .choices{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .choices .ch[data-v="na"]{grid-column:1/-1}
+  .ch{flex-direction:column;text-align:center;gap:4px;padding:8px 4px}
+  .ch small{font-size:.72rem}
+  .follow{grid-template-columns:minmax(0,1fr)}
+  .rv-row{grid-template-columns:minmax(0,1fr) auto}
+  .rv-row .stack{grid-column:1/-1;order:3}
+  .brand span,.who{display:none}
+  .card{padding:18px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><b>Country Office Annual Requirements</b><span id="brand-sub">Annual self-assessment</span></div>
+    <span class="savest" id="savest" data-s="saved" hidden><i></i><span id="savest-t">All changes saved</span></span>
+    <span class="who" id="who"></span>
+    <span class="demo-chip" id="demo-chip" hidden>Demo mode</span>
+  </div>
+</header>
+<main class="wrap" id="app"></main>
+<div class="toast" id="toast" hidden></div>
+
+<script src="config.js"></script>
+<script>
+/* ================= CONFIGURATION =================
+   The settings live in a separate file, config.js, next to this page (see the setup guide).
+   Without config.js, or with LAYER_URL empty, the form runs in demo mode (data stays in this browser). */
+const CONFIG = Object.assign({
+  PORTAL_URL: "https://www.arcgis.com",
+  CLIENT_ID: "",
+  LAYER_URL: "",
+  COUNTRY_LAYER_URLS: {},
+  DEFAULT_YEAR: "2026",
+  SUBMIT_ROLES: ["country_director"]
+}, window.COAR_CONFIG || {});
+CONFIG.PORTAL_URL = String(CONFIG.PORTAL_URL).replace(/\/+$/, "");
+// Sign-in return address: the page's folder address, so ".../coar-form/" and ".../coar-form/index.html" both work.
+CONFIG.REDIRECT_URI = CONFIG.REDIRECT_URI || (location.origin + location.pathname.replace(/index\.html$/, ""));
+/* ================================================= */
+
+const DATA = {"sections": [{"code": "SMS", "num": 1, "name": "Staff and Management Support", "respondent": "Country Director"}, {"code": "INT", "num": 2, "name": "International Department", "respondent": "Country Director"}, {"code": "DON", "num": 3, "name": "Donor and Grant management", "respondent": "Country Director"}, {"code": "COM", "num": 4, "name": "Communications and Marketing", "respondent": "Country Director"}, {"code": "PAR", "num": 5, "name": "Partner management", "respondent": "Country Director"}, {"code": "ACO", "num": 6, "name": "Anti corruption work", "respondent": "Country Director"}, {"code": "ICT", "num": 7, "name": "Information Technology", "respondent": "IT Officer / Country Director"}, {"code": "SEC", "num": 8, "name": "Security", "respondent": "Security Focal Point"}, {"code": "CMP", "num": 9, "name": "Compliance", "respondent": "Country Director"}, {"code": "CRS", "num": 10, "name": "Cross cutting", "respondent": "Country Director"}, {"code": "SFG", "num": 11, "name": "Safeguarding", "respondent": "Safeguarding Focal Point"}, {"code": "CFM", "num": 12, "name": "CFM", "respondent": "Safeguarding Focal Point"}, {"code": "LOG", "num": 13, "name": "Logistics", "respondent": "Logistics Manager"}, {"code": "HSE", "num": 14, "name": "HSE", "respondent": "Country Director"}, {"code": "HR", "num": 15, "name": "Human Resources", "respondent": "HR Manager"}, {"code": "FIN", "num": 16, "name": "Finance", "respondent": "Finance Manager"}], "items": [{"id": "SMS_01", "code": "SMS", "sub": null, "q": "Registration and reporting as a NGO/legal entity. Provide links", "links": [], "gov": "Country Office Handbook (to be developed)", "nogov": true, "hint": "", "coNote": ""}, {"id": "SMS_02", "code": "SMS", "sub": null, "q": "Do you have a retainer arrangement with a local lawyer?", "links": [], "gov": "Country Office Handbook (to be developed)", "nogov": true, "hint": "", "coNote": ""}, {"id": "SMS_03", "code": "SMS", "sub": null, "q": "Does the Country Director have a Power of Attorney issued by Head Office? Provide link.", "links": [], "gov": "Country Office Handbook (to be developed)", "nogov": true, "hint": "", "coNote": ""}, {"id": "SMS_04", "code": "SMS", "sub": null, "q": "Are all MoUs in place with the relevant authorities? Provide links.", "links": [], "gov": "Country Office Handbook (to be developed)", "nogov": true, "hint": "", "coNote": ""}, {"id": "SMS_05", "code": "SMS", "sub": null, "q": "Do you have accreditation for mine action operations. Provide links", "links": [["Standard (cat 3): International Mine Action Standard 07.30/01", "https://www.mineactionstandards.org/standards/07-30-01/"]], "gov": "Standard (cat 3): International Mine Action Standard 07.30/01", "nogov": false, "hint": "", "coNote": ""}, {"id": "INT_01", "code": "INT", "sub": null, "q": "Does your organisation structure comply with the country office standard set up?", "links": [["Policy (cat 2): Country Office Design Policy", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQDBDrC4bPZlTKKKnXNVKjnZAcJPh29XImvJ3UGKKH1zTns?e=HUzxpx&or=PPT-WEB.BODY.NT&ct=1790585292708"], ["Visual (cat 4): Standard-set up VIsual", "https://npaid.sharepoint.com/:p:/s/KeyDocumentsinNPA/IQDu9YnVORxrQZMFPRGlxhiMAW-aV3DVFicGLsGEuWY8vhk?e=TPuhee"]], "gov": "Policy (cat 2): Country Office Design Policy Visual (cat 4): Standard-set up Visual", "nogov": false, "hint": "on SP?", "coNote": ""}, {"id": "INT_02", "code": "INT", "sub": null, "q": "Do you have regular Senior Management Team (SMT) meetings?", "links": [["Policy (cat 2): Country office SMT standard ToR", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQCHa10bcpYjRKYi2oRfZwBDAb2BpqgYV8Zmy9u0SW0jvcw?e=jKVeNA&or=WORD-WEB.BODY.NT&ct=1789035895876&CID=20A43AEB-9844-49E1-BA27-8DA742C8E43A"]], "gov": "Policy (cat 2): Country office SMT standard ToR", "nogov": false, "hint": "how often?", "coNote": ""}, {"id": "INT_03", "code": "INT", "sub": null, "q": "Are written minutes from these meetings circulated and stored appropriately?", "links": [["Policy (cat 2): Country office SMT standard ToR", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQCHa10bcpYjRKYi2oRfZwBDAb2BpqgYV8Zmy9u0SW0jvcw?e=jKVeNA&or=WORD-WEB.BODY.NT&ct=1789035895876&CID=20A43AEB-9844-49E1-BA27-8DA742C8E43A"]], "gov": "Policy (cat 2): Country office SMT standard ToR", "nogov": false, "hint": "", "coNote": ""}, {"id": "INT_04", "code": "INT", "sub": null, "q": "Do you respond to and implement recommendations in HO trip reports?", "links": [], "gov": "Country Office Handbook (to be developed)", "nogov": true, "hint": "", "coNote": ""}, {"id": "INT_05", "code": "INT", "sub": null, "q": "Is your master action task list update and followed up?", "links": [], "gov": "Country Office Handbook (to be developed)", "nogov": true, "hint": "", "coNote": ""}, {"id": "INT_06", "code": "INT", "sub": null, "q": "Is the risk management matrix being actively used in programme and project management, and for developing donor proposals?", "links": [["Policy (cat 2): Risk Management Policy", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQBB5Weeu5nnRqlswyAQhnwCAS6ip9V2wsEBPieAMVE713g?e=Rx965Z"], ["Add CO Risk Management Matrix document", "https://npaid.sharepoint.com/sites/HO-FIN-RiskManagement/RiskAssessments/Forms/AllItems.aspx?id=%2Fsites%2FHO%2DFIN%2DRiskManagement%2FRiskAssessments%2FCountry%20Office&viewid=b0c55a8f%2D7eee%2D4295%2D9f48%2D9ff5cb1d1c62"]], "gov": "Policy (cat 2): Risk Management Policy FILL IN: CO Risk Management Matrix", "nogov": false, "hint": "", "coNote": "Upload CO risk management matrix to library:"}, {"id": "INT_07", "code": "INT", "sub": null, "q": "Has at least one employee representative been elected by the national staff?", "links": [["Handbook (cat 3) - 4.1 Election of employee representative(s)", "https://cp.compendia.no/norsk-folkehjelp/expat-handbook/1217748"]], "gov": "Handbook (cat 3) - 4.1 Election of employee representative(s)", "nogov": false, "hint": "", "coNote": ""}, {"id": "DON_01", "code": "DON", "sub": null, "q": "Is the fundraising plan being implemented?", "links": [], "gov": "To be developed", "nogov": true, "hint": "", "coNote": ""}, {"id": "DON_02", "code": "DON", "sub": null, "q": "Do you have regular meetings with local donors? Provide link to donor engagement tracker.", "links": [], "gov": "To be developed", "nogov": true, "hint": "", "coNote": ""}, {"id": "DON_03", "code": "DON", "sub": null, "q": "Is a \"go / no go\" meeting conducted before starting a proposal development process?", "links": [["Assessment Tool (cat 4): Go No-Go Tool", "https://npaid.sharepoint.com/:x:/s/HO-DHC-Handbook/EdrNgviW7WpIksJX_g6PUMcBh2KeNMx0U6cKXbwBDahHPg?e=Om67Nl&CID=ADC426B7-C736-47AD-9973-4AAE8D113602"]], "gov": "Assessment Tool (cat 4): Go No-Go Tool", "nogov": false, "hint": "", "coNote": ""}, {"id": "DON_04", "code": "DON", "sub": null, "q": "Are \"kick off meetings\" held as part of the proposal development process?", "links": [["Procedure (cat 3): Project Cycle Management", "https://npaid.sharepoint.com/sites/HO-DHC-Handbook/SitePages/Project%20Cycle%20Management.aspx?isSPOFile=1&xsdata=MDV8MDJ8fDM1NzVjOTVlNjgxNDRlNWVjMzk1MDhkZjBlNTZkY2YzfDg3Yzk2ZjcyNjc5YzQxZWJiZmU3ZWMxYWUyNDg2ZjI2fDB8MHw2MzkyNDU0MzgzNDY4NDM4MTl8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKRFFTSTZJbFJsWVcxelgwRlVVRk5sY25acFkyVmZVMUJQVEU5R0lpd2lWaUk2SWpBdU1DNHdNREF3SWl3aVVDSTZJbGRwYmpNeUlpd2lRVTRpT2lKUGRHaGxjaUlzSWxkVUlqb3hNWDA9fDF8TDJOb1lYUnpMekU1T20xbFpYUnBibWRmV2tSYWFscEhVbXhOZWxsMFQwUkNhbGxwTURCTmJVMHhURlJuTTFsNlRYUk5lbFY1VGpKYWJFOUhUWGxaYlZwdFFIUm9jbVZoWkM1Mk1pOXRaWE56WVdkbGN5OHhOemc0T1RRM01ETXpNVEF5fGQ1OTE4Mzg2NjE5ODRmZmEzOWI3MDhkZjBlNTZkY2YzfGMxYTEzN2U4ZDkyMDRjNTM5MzVkZmRiZTM1YzY2OWY0&sdata=Q3hVNnFtR0VLMGRqbDdxNWtvRVhpeURFYmFCZzk2MkliSTJOR3MyMFJYWT0%3D&ovuser=87c96f72-679c-41eb-bfe7-ec1ae2486f26%2CKnuVol521%40npaid.org&TeamsCID=6d5f0611-6d84-4449-8af7-075f22145b5b&OR=Teams-HL&CT=1788947048194&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNjA4MTMxOTMwOCJ9&linkOpenTime=1788947048212"]], "gov": "Procedure (cat 3): Project Cycle Management", "nogov": false, "hint": "", "coNote": ""}, {"id": "DON_05", "code": "DON", "sub": null, "q": "Do you always have \"grant opening meetings\", capturing all donor requirements?", "links": [["Procedure (cat 3): Grant Opening Meeting", "https://npaid.sharepoint.com/:w:/r/sites/GLO-Finance-QMS/_layouts/15/Doc.aspx?sourcedoc=%7B39C4C5D0-9558-4E7A-87C2-42D4F1E7A6F1%7D&file=1-4%20PGM%20-%20Grant%20Opening%20Meeting.doc&action=default&mobileredirect=true&CID=A9E4D92A-DDDF-454E-AF13-CDD16D7AD2B4"]], "gov": "Procedure (cat 3): Grant Opening Meeting", "nogov": false, "hint": "", "coNote": ""}, {"id": "DON_06", "code": "DON", "sub": null, "q": "Do you have an overview of your contractual requirements with donors - including a timeline of deliverables and deadlines for any pre-approvals/modifications?", "links": [], "gov": "To be developed", "nogov": true, "hint": "", "coNote": ""}, {"id": "DON_07", "code": "DON", "sub": null, "q": "Do you follow the [HO proposal/grant management processes/procedure]?", "links": [], "gov": "To be developed", "nogov": true, "hint": "", "coNote": ""}, {"id": "DON_08", "code": "DON", "sub": null, "q": "Does the CD approve all final versions of donor deliverables (eg proposals, reports)?", "links": [], "gov": "To be developed", "nogov": true, "hint": "", "coNote": ""}, {"id": "COM_01", "code": "COM", "sub": null, "q": "Is the Communication and Advocacy plan being implemented? (see deliverables tracker)", "links": [], "gov": "Needs to be added", "nogov": true, "hint": "", "coNote": ""}, {"id": "COM_02", "code": "COM", "sub": null, "q": "Does the country office have its own social media platforms (provide links)", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "COM_03", "code": "COM", "sub": null, "q": "Do the social media platforms comply with NPA policies?", "links": [["Tool/webpage (cat 4): NPA Brand Portal", "https://brand.npaid.org/point/en/norskfolkehjelp/"]], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "COM_04", "code": "COM", "sub": null, "q": "Are all social media platforms moderated and monitored for harmful behaviour online, especially towards children, youth or adults at risk?", "links": [["Policy (cat 2): Safeguarding Policy", "https://npaid.sharepoint.com/:b:/s/KeyDocumentsinNPA/IQAWNkYca1-EToBUgq0xc_sIAUNQporVgZIqvellyAJA7Nc?e=EaSE0X"]], "gov": "Policy (cat 2): Safeguarding Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "COM_05", "code": "COM", "sub": null, "q": "Are all pictures of your programme/by employees working or visiting your programme taken with informed consent by child and parent/guardian?", "links": [["Policy (cat 2): Safeguarding Policy", "https://npaid.sharepoint.com/:b:/s/KeyDocumentsinNPA/IQAWNkYca1-EToBUgq0xc_sIAUNQporVgZIqvellyAJA7Nc?e=EaSE0X"]], "gov": "Policy (cat 2): Safeguarding Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "PAR_01", "code": "PAR", "sub": null, "q": "Do you assess all the partners according to the Partner Financial Assessment tool (PFAT)?", "links": [["Guideline (cat 3) PFAT - Partner Financial Assessment Guideline", "https://npaid.sharepoint.com/:w:/r/sites/GLO-Finance-QMS/_layouts/15/Doc.aspx?sourcedoc=%7B7763DC5A-D775-4F00-8126-163821F56A2B%7D&file=Partner%20Financial%20Assessment%20Guideline.docx&action=default&mobileredirect=true&DefaultItemOpen=1"], ["Tool (cat 4) PFAT - Partner Financial Capacity Assessment Tool", "https://npaid.sharepoint.com/:x:/r/sites/GLO-Finance-QMS/_layouts/15/Doc.aspx?sourcedoc=%7B93B91142-40D9-4D95-BCC5-1146D08051AE%7D&file=Partner%20Financial%20Capacity%20Assessment%20Tool.xlsx&action=default&mobileredirect=true&DefaultItemOpen=1"]], "gov": "Guideline (cat 3): PFAT Guideline Tool (cat 4): PFAT Tool", "nogov": false, "hint": "", "coNote": ""}, {"id": "PAR_02", "code": "PAR", "sub": null, "q": "Have you implemented the Partner Risk Mitigation tool?", "links": [["Guideline (cat 3): Partner Risk Mitigation Guideline", "https://npaid.sharepoint.com/:w:/r/sites/GLO-Finance-QMS/_layouts/15/Doc.aspx?sourcedoc=%7B428BF1F8-A51B-4B66-89F2-C22D7DDB49B3%7D&file=NPA%20Partner%20Risk%20Mitigation.docx&action=default&mobileredirect=true&DefaultItemOpen=1&CID=BFFE7F39-7E92-42FB-B91A-D627F9818EC0"]], "gov": "Guideline (cat 3): Partner Risk Mitigation Guideline", "nogov": false, "hint": "", "coNote": ""}, {"id": "PAR_03", "code": "PAR", "sub": null, "q": "Do you implement Organisational Development Dialogue and Assessment Tool (ODDAT) with partners?", "links": [["ODDAT for results monitoring", "https://npaid.sharepoint.com/:u:/r/sites/HO-DHC-Handbook/SitePages/ODDAT%20for%20results%20monitoring.aspx?d=w1f26374399ee48adbc6cbca3f64b6999&csf=1&web=2&share=IQBDNyYf7pmtSLxsvKP2S2mZARz2-WwaROD_SmaRQF3MQpE&e=LHFdFc"]], "gov": "CIV handbook - guidelines", "nogov": false, "hint": "", "coNote": ""}, {"id": "PAR_04", "code": "PAR", "sub": null, "q": "Do you comply to contractual terms with regard to transferring funds to partner (reporting, %spending, maximum amounts not exceeded)?", "links": [["Cooperating Partner Contract Template Norad 2025-2029.docx", "https://npaid.sharepoint.com/:w:/r/sites/GLO-Finance-QMS/KB/Cooperating%20Partner%20Contract%20Template%20Norad%202025-2029.docx?d=wb3eaf8decaa34600a3ff5a7432f8b9b9&csf=1&web=1&e=HVk3CC"]], "gov": "Finance handbook - Partner management", "nogov": false, "hint": "", "coNote": ""}, {"id": "PAR_05", "code": "PAR", "sub": null, "q": "Do you require documentation confirming that the payment/grant has been correctly entered into the partners accounts?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "Do you document this? Do you use checklists?", "coNote": ""}, {"id": "PAR_06", "code": "PAR", "sub": null, "q": "Do you follow up all partners' audits and management letters?", "links": [["13 6 Audits - Partner audit_new guideline.doc", "https://npaid.sharepoint.com/:w:/r/sites/GLO-Finance-QMS/KB/13%206%20Audits%20-%20Partner%20audit_new%20guideline.doc?d=wd667e87fff384270a3892891b247096f&csf=1&web=1&e=dvBsYv"]], "gov": "Finance handbook - Partner management", "nogov": false, "hint": "Do you document this? Do you use checklists?", "coNote": ""}, {"id": "PAR_07", "code": "PAR", "sub": null, "q": "Have all partners been offered training on Safeguarding?", "links": [], "gov": "Policy (cat 2): Safeguarding Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "PAR_08", "code": "PAR", "sub": null, "q": "Do all partners have a Safeguarding (or equivalent) policy in accordance with the contract?", "links": [], "gov": "Policy (cat 2): Safeguarding Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "PAR_09", "code": "PAR", "sub": null, "q": "Have all partners been offered a joint needs assessment and support to draw up Safeguarding policies and routines, where needed?", "links": [], "gov": "Policy (cat 2): Safeguarding Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "PAR_10", "code": "PAR", "sub": null, "q": "Are all cooperating partners offered support to conduct internal investigations?", "links": [], "gov": "Policy (cat 2): Safeguarding Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "PAR_11", "code": "PAR", "sub": null, "q": "Are all cooperating partners reporting suspected Safeguarding cases immediately to NPA, in accordance with their contractual obligation?", "links": [], "gov": "Policy (cat 2): Safeguarding Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "ACO_01", "code": "ACO", "sub": null, "q": "Does the programme have staff with the necessary competence for investigating corruption cases?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "ACO_02", "code": "ACO", "sub": null, "q": "Do all staff and stakeholders know how to report corruption cases, and what protection NPA offer them in return?", "links": [["Policy (cat 2): NPA Anti-Corruption Policy 2026", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQDRnj1HguRfRZPP7d1BRQR-AZmbiCrzcnxUyJonyEWUaww?e=HKEcgb"], ["Policy (cat 2): Conflict of Interest Policy (2026)", "https://npaid.sharepoint.com/:b:/s/KeyDocumentsinNPA/IQDayQkuEy3GQrjWQIUshdoWAYjCcLohvSBUJVgX0jd42Dw?e=LWXDFX"]], "gov": "Policy (cat 2): NPA Anti-Corruption Policy 2026 Policy (cat 2): Conflict of Interest Policy (2026)", "nogov": false, "hint": "", "coNote": ""}, {"id": "ACO_03", "code": "ACO", "sub": null, "q": "Have you reported all suspicions of corrupt practices about NPA or partner employees without delay?", "links": [["Policy (cat 2): NPA Anti-Corruption Policy 2026", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQDRnj1HguRfRZPP7d1BRQR-AZmbiCrzcnxUyJonyEWUaww?e=HKEcgb"]], "gov": "Policy (cat 2): NPA Anti-Corruption Policy 2026", "nogov": false, "hint": "", "coNote": ""}, {"id": "ACO_04", "code": "ACO", "sub": null, "q": "Does the Country Office have a Focal Point on Anti-Corruption?", "links": [["Policy (cat 2): NPA Anti-Corruption Policy 2026", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQDRnj1HguRfRZPP7d1BRQR-AZmbiCrzcnxUyJonyEWUaww?e=HKEcgb"]], "gov": "Policy (cat 2): NPA Anti-Corruption Policy 2026", "nogov": false, "hint": "", "coNote": ""}, {"id": "ICT_01", "code": "ICT", "sub": null, "q": "Do you involve IT at HO at the beginning of procurement of IT service/system", "links": [["Policy (cat 2): NPA Information Security Policy", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQDcAygmdgw3T7RBgWaHc78KAWTP2YLURt9iUtrY9_NMrQs?e=TI3ZWV"]], "gov": "Policy (cat 2): NPA Information Security Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "ICT_02", "code": "ICT", "sub": null, "q": "Is there IT system orientation for new employees?", "links": [["Policy (cat 2): NPA Information Security Policy", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQDcAygmdgw3T7RBgWaHc78KAWTP2YLURt9iUtrY9_NMrQs?e=TI3ZWV"]], "gov": "Policy (cat 2): NPA Information Security Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "ICT_03", "code": "ICT", "sub": null, "q": "Do you remove users who have ended their contract with NPA? routine", "links": [["Policy (cat 2): NPA Information Security Policy", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQDcAygmdgw3T7RBgWaHc78KAWTP2YLURt9iUtrY9_NMrQs?e=TI3ZWV"]], "gov": "Policy (cat 2): NPA Information Security Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "ICT_04", "code": "ICT", "sub": null, "q": "Do your staff use any communication platform internally, that is not NPA standard?", "links": [["Policy (cat 2): NPA Information Security Policy", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQDcAygmdgw3T7RBgWaHc78KAWTP2YLURt9iUtrY9_NMrQs?e=TI3ZWV"]], "gov": "Policy (cat 2): NPA Information Security Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "ICT_05", "code": "ICT", "sub": null, "q": "Are any of the staff storing work related information in local storage on their laptop?", "links": [["Policy (cat 2): NPA Acceptable Use Policy", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQDHjeM4rqjJS5eXuUL-7mmZAcfaFxXztJUFE9ppMQLG61k?e=kkyc1R"]], "gov": "Policy (cat 2): NPA Acceptable Use Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "ICT_06", "code": "ICT", "sub": null, "q": "Does the Country Office have any non NPA standard system that you store data in?", "links": [["Policy (cat 2): NPA Acceptable Use Policy", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQDHjeM4rqjJS5eXuUL-7mmZAcfaFxXztJUFE9ppMQLG61k?e=kkyc1R"]], "gov": "Policy (cat 2): NPA Acceptable Use Policy", "nogov": false, "hint": "if yes, is the system secured in other ways than just usernames and passwords", "coNote": ""}, {"id": "ICT_07", "code": "ICT", "sub": null, "q": "Is the internet connection shared with others than staff?", "links": [["Policy (cat 2): NPA Information Security Policy", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQDcAygmdgw3T7RBgWaHc78KAWTP2YLURt9iUtrY9_NMrQs?e=TI3ZWV"]], "gov": "Policy (cat 2): NPA Information Security Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "ICT_08", "code": "ICT", "sub": null, "q": "Are information security incidents followed up and reported?", "links": [["Tool (cat 4): Security incident reporting SharePoint site", "https://npaid.sharepoint.com/sites/GLO-SEC/SitePages/Security-incident-reporting.aspx"]], "gov": "Tool (cat 4): Security incident reporting SharePoint site", "nogov": false, "hint": "", "coNote": ""}, {"id": "ICT_09", "code": "ICT", "sub": null, "q": "Are deviations from IT standards being documented?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "ICT_10", "code": "ICT", "sub": null, "q": "Does the Office have clear guidelines on who is responsible for screenings against sanctions lists and when this should be undertaken ?", "links": [["Routine (cat 3): Routine for Screening Against Sanctions and Terrorist Lists", "https://npaid.sharepoint.com/:b:/s/KeyDocumentsinNPA/IQDfd8caU0f5QaU8qCFItP_yATfN3AoVHfc1jIFUmXe2yXA?e=j8D3Aq"]], "gov": "Routine (cat 3): Routine for Screening Against Sanctions and Terrorist Lists", "nogov": false, "hint": "", "coNote": ""}, {"id": "ICT_11", "code": "ICT", "sub": null, "q": "Is the Country Office aware of any applicable sanctions regimes (e.g. US, EU or UN) against their country of intervention ?", "links": [["Policy (cat 2): Sanctions and Anti-terrorism Policy", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQDNnDL-qjmsRbFL-rXqeD_qAZQ4ht2HGOxVEmSi7Anwby8?e=nQIbLq"]], "gov": "Policy (cat 2): Sanctions and Anti-terrorism Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "ICT_12", "code": "ICT", "sub": null, "q": "Is the NPA Risk Mitigation Instructions for Payments regularly consulted for payments to suppliers, partners and employees?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "ICT_13", "code": "ICT", "sub": null, "q": "Has the country office established procedures to ensure personal data - including beneficiary data - is collected, used, stored, shared, and deleted in accordance with NPA's Data Privacy Policy and local legal obligations?", "links": [["Policy (cat 2): Policy for Data Privacy", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQCnUOMlE8RrQIlRasFVaJoBAd7PPAFkV6j_U5wLgHTYnuc?e=B8brR8"]], "gov": "Policy (cat 2): Policy for Data Privacy", "nogov": false, "hint": "", "coNote": ""}, {"id": "SEC_01", "code": "SEC", "sub": null, "q": "Do all visitors to the programme receive the pre-travel briefing prior to arriving in country and the in-country security briefing upon arrival?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "SEC_02", "code": "SEC", "sub": null, "q": "Does the programme have an updated set of relevant security management SOPs, based on the outcome of the security risk assessment?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "SEC_03", "code": "SEC", "sub": null, "q": "Are security SOPs fully implemented in the programme?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "SEC_04", "code": "SEC", "sub": null, "q": "Have all programme staff been introduced to and trained on the crisis management procedure? Has the CO SMT had a crisis management exercise within the last two years or as soon as a new CD has been appointed?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "SEC_05", "code": "SEC", "sub": null, "q": "Are all staff aware of the security incident reporting tool on SP?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "SEC_06", "code": "SEC", "sub": null, "q": "Does the programme have a systematic approach to identify and report security related incidents?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "SEC_07", "code": "SEC", "sub": null, "q": "Have security incidents and near misses been timely reported through the security incident reporting tool on SP?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "CMP_01", "code": "CMP", "sub": null, "q": "Does the Country Office have clear guidelines on who is responsible for screenings against sanctions lists and when this should be undertaken ?", "links": [["Routine (cat 3): Routine for Screening Against Sanctions and Terrorist Lists", "https://npaid.sharepoint.com/:b:/s/KeyDocumentsinNPA/IQDfd8caU0f5QaU8qCFItP_yATfN3AoVHfc1jIFUmXe2yXA?e=j8D3Aq"]], "gov": "Routine (cat 3): Routine for Screening Against Sanctions and Terrorist Lists", "nogov": false, "hint": "", "coNote": ""}, {"id": "CMP_02", "code": "CMP", "sub": null, "q": "Is the Country Office aware of any applicable sanctions regimes (e.g. US, EU or UN) against their country of intervention ?", "links": [["Policy (cat 2): Sanctions and Anti-terrorism Policy", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQDNnDL-qjmsRbFL-rXqeD_qAZQ4ht2HGOxVEmSi7Anwby8?e=nQIbLq"]], "gov": "Policy (cat 2): Sanctions and Anti-terrorism Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "CMP_03", "code": "CMP", "sub": null, "q": "Is the NPA Risk Mitigation Instructions for Payments regularly consulted for payments to suppliers, partners and employees?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "CRS_01", "code": "CRS", "sub": null, "q": "Has the Country Office established and implemented an Environmental Management System (EMS) in accordance with NPA's Climate and Environment Policy and EMS Programme Handbook?", "links": [["Policy (cat 2): Climate and Environment Policy", "https://npaid.sharepoint.com/:w:/s/KeyDocumentsinNPA/IQDLNki9qGa4SbaRclQUgtVDAT7P3fgWlHaoJOaWWZMnetU?e=0kekYh"], ["Handbook (cat 3): Climate, Environment Sustainability in INPA International Programmes", "https://npaid.sharepoint.com/:b:/s/GLO-Climate-Environment-and-Sustainability/IQAm1du4tOnZQLhpZPKxFySPAR9CfdvVSCCUuHiZGvUpWlw?e=dxAfjD"]], "gov": "Policy (cat 2): Climate and Environment Policy Guideline (cat 3): CES Programme Handbook", "nogov": false, "hint": "", "coNote": ""}, {"id": "CRS_02", "code": "CRS", "sub": null, "q": "Environmental Focal Point assigned", "links": [["Handbook (cat 3): Climate, Environment Sustainability in INPA International Programmes", "https://npaid.sharepoint.com/:b:/s/GLO-Climate-Environment-and-Sustainability/IQAm1du4tOnZQLhpZPKxFySPAR9CfdvVSCCUuHiZGvUpWlw?e=dxAfjD"]], "gov": "Guideline (cat 3): CES Programme Handbook", "nogov": false, "hint": "", "coNote": ""}, {"id": "CRS_03", "code": "CRS", "sub": null, "q": "Gender Transformative Programme design (incl. using the GAD Marker at design stage) & RFs", "links": [["Policy (cat 2): Gender Equality Policy (2017)", "https://folkehjelp.no/files/Publications/Development-and-Humanitarian-Cooperation/NPA_GENDER_POLICY.pdf"]], "gov": "Policy (cat 2): Gender Equality Policy (2017)", "nogov": false, "hint": "", "coNote": ""}, {"id": "CRS_04", "code": "CRS", "sub": null, "q": "Annual Plan for Strengthening Capacity of Staff and Partners for Gender Equality Programming at CO level being implemented", "links": [["Policy (cat 2): Gender Equality Policy (2017)", "https://folkehjelp.no/files/Publications/Development-and-Humanitarian-Cooperation/NPA_GENDER_POLICY.pdf"]], "gov": "Policy (cat 2): Gender Equality Policy (2017)", "nogov": false, "hint": "", "coNote": ""}, {"id": "SFG_01", "code": "SFG", "sub": null, "q": "Are appropriate operating procedures in place to ensure NPA staff never work alone with programme beneficiaries, especially children and youth?", "links": [], "gov": "Policy (cat 2): Safeguarding Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "SFG_02", "code": "SFG", "sub": null, "q": "Have you consulted the Global Safeguarding Advisor to ensure appropriate questions are included in any staff surveys you have conducted?", "links": [], "gov": "Policy (cat 2): Safeguarding Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "SFG_03", "code": "SFG", "sub": null, "q": "Have you reported all Safeguarding complaints or concerns you have received about NPA or partner employees to the Special Advisor Safeguarding within 24-48 hours?", "links": [], "gov": "Policy (cat 2): Safeguarding Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "SFG_04", "code": "SFG", "sub": null, "q": "Safeguarding focal point(s) is assigned", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "SFG_05", "code": "SFG", "sub": null, "q": "Do all staff receive Safeguarding training at a level commensurate with their role in the organisation?", "links": [], "gov": "Policy (cat 2): Safeguarding Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "CFM_01", "code": "CFM", "sub": null, "q": "Does the country office have a functioning CFM in place in accordance with the CFM toolkit?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "CFM_02", "code": "CFM", "sub": null, "q": "Do all programme beneficiaries and cooperating partners know how to report concerns or allegations of abuse, and what protections NPA offers them in return?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "CFM_03", "code": "CFM", "sub": null, "q": "Do all employees and cooperating partners have information about how to report concerns or allegations of abuse?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "CFM_04", "code": "CFM", "sub": null, "q": "Are programme beneficiaries told how NPA representatives are expected to behave as part of all programme design?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_01", "code": "LOG", "sub": null, "q": "Are market surveys done periodically to check prices of regularly purchased items?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_02", "code": "LOG", "sub": null, "q": "Is the preferred suppliers list reviewed minimum once a year?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_03", "code": "LOG", "sub": null, "q": "Is procurement handled in accordance with procurement strategy and procurement plan?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_04", "code": "LOG", "sub": null, "q": "Are all procurement documents linked and traceable?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_05", "code": "LOG", "sub": null, "q": "Is the list of issued procurement waivers kept and up to date?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_06", "code": "LOG", "sub": null, "q": "Are all received/issued goods handled in accordance with the procedure 'Warehouse management'?", "links": [["Guideline (cat 3): Warehouse Management Guideline", "https://npaid.sharepoint.com/:w:/r/sites/GLO-Logistics-QMS/_layouts/15/Doc.aspx?sourcedoc=%7B4D15820A-122F-41E3-B148-B89BD0B103E1%7D&file=Warehouse%20Management.docx&action=default&mobileredirect=true"]], "gov": "Guideline (cat 3): Warehouse Management Guideline", "nogov": false, "hint": "", "coNote": ""}, {"id": "LOG_07", "code": "LOG", "sub": null, "q": "Are spot checks of warehouse management conducted by CD or FM?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_08", "code": "LOG", "sub": null, "q": "Is all stock related to a specific project distributed within the project period?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_09", "code": "LOG", "sub": null, "q": "Is quaterly stock reconciliation report produced regularly?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_10", "code": "LOG", "sub": null, "q": "Are fixed assets are properly registered and up-to-date in Agresso?", "links": [], "gov": "Handbook (cat 3): Asset Management", "nogov": false, "hint": "", "coNote": ""}, {"id": "LOG_11", "code": "LOG", "sub": null, "q": "Are assets physically tagged with unique numbers to allow easy identification?", "links": [], "gov": "Handbook (cat 3): Asset Management", "nogov": false, "hint": "", "coNote": ""}, {"id": "LOG_12", "code": "LOG", "sub": null, "q": "Are all inventory items tracked correctly, either in a spreadsheet or in Agresso (preferably in Agresso), and the information is current.", "links": [], "gov": "Handbook (cat 3): Asset Management", "nogov": false, "hint": "", "coNote": ""}, {"id": "LOG_13", "code": "LOG", "sub": null, "q": "Was a full year-end stock take verification performed, and the status of assets and inventory verified, as required by the procedure Verification of assets and inventories.", "links": [], "gov": "Handbook (cat 3): Asset Management", "nogov": false, "hint": "", "coNote": ""}, {"id": "LOG_14", "code": "LOG", "sub": null, "q": "Are assets and/or inventory that are not needed and/or are unusable were identified and properly disposed of at year-end and these items were closed in Agresso.", "links": [], "gov": "Handbook (cat 3): Asset Management", "nogov": false, "hint": "", "coNote": ""}, {"id": "LOG_15", "code": "LOG", "sub": null, "q": "Are maintenance schedules followed for all vehicles?", "links": [["Guideline (cat 3): Fleet Management Guideline", "https://npaid.sharepoint.com/sites/GLO-Logistics-QMS/KB/Fleet%20Management.docx?web=1"]], "gov": "Guideline (cat 3): Fleet Management Guideline", "nogov": false, "hint": "", "coNote": ""}, {"id": "LOG_16", "code": "LOG", "sub": null, "q": "Are all vehicles (/generators) safe to use/operate and have a valid registration and insurance cover?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_17", "code": "LOG", "sub": null, "q": "Do only authorised staff drive NPA vehicles?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_18", "code": "LOG", "sub": null, "q": "Do all vehicles carry a log book (with mileage, fuel consumption, fuel filling and maintenance)that is completed for every journey ?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_19", "code": "LOG", "sub": null, "q": "Is vehicle use and fuel consumption calculated and checked every month for each vehicle?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_20", "code": "LOG", "sub": null, "q": "Are generator usage, fuel and maintenance tracked and recorded?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_21", "code": "LOG", "sub": null, "q": "Is vehicle fleet composition and size optimal for the size of the office?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "LOG_22", "code": "LOG", "sub": null, "q": "Do you have procedures for private use of NPA cars?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "HSE_01", "code": "HSE", "sub": null, "q": "Are you following up on the Health, Safety and Environment (HSE) annual management review?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "HR_01", "code": "HR", "sub": null, "q": "All employees have signed employment contracts which comply with local labour law and NPA requirements.", "links": [["Policy (cat 2): HR Policy for National Staff", "https://cp.compendia.no/norsk-folkehjelp/expat-handbook/1217663"]], "gov": "Policy (cat 2): HR Policy for National Staff Template (cat 3 or 4): Employment Contract Templates Tool (cat 4): Soliday", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_02", "code": "HR", "sub": null, "q": "The Global Staff policy is followed and the appendix for overriding rules is up to date", "links": [["Policy (cat 2): HR Policy for National Staff", "https://cp.compendia.no/norsk-folkehjelp/expat-handbook/1217663"], ["Appendices (cat 4): Appendices for overriding rules", "https://cp.compendia.no/norsk-folkehjelp/expat-handbook/1217703"]], "gov": "Policy (cat 2): HR Policy for National Staff Appendices (cat 4): Appendices for overriding rules", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_03", "code": "HR", "sub": null, "q": "Personnel files in Soliday are complete and up to date, including updated employment contracts and relevant certificates.", "links": [["Guidance (cat 3): Guidance on using Soliday", "https://npaid.sharepoint.com/sites/GLO-HR/SitePages/Workday(1).aspx?csf=1&web=1&share=ETOm1ySInUFLhxwcy8v0DQsBk86nyIwubgsLRNMWY2opPg&e=uSxW9c&CID=f25105d0-c16d-4d5a-a3ba-b425254fe27f"]], "gov": "Guidance (cat 3): Guidance on using Soliday", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_04", "code": "HR", "sub": null, "q": "All key policies and contractual documents are available to all staff in a language they understand.", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "HR_05", "code": "HR", "sub": null, "q": "Employees are registered correctly in Soliday, including role category, contract type, location, payroll information and employment status.", "links": [["Guidance (cat 3): Guidance on using Soliday", "https://npaid.sharepoint.com/sites/GLO-HR/SitePages/Workday(1).aspx?csf=1&web=1&share=ETOm1ySInUFLhxwcy8v0DQsBk86nyIwubgsLRNMWY2opPg&e=uSxW9c&CID=f25105d0-c16d-4d5a-a3ba-b425254fe27f"]], "gov": "Guidance (cat 3): Guidance on using Soliday", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_06", "code": "HR", "sub": null, "q": "Reporting lines and supervisory organisations are registered correctly in Soliday.", "links": [["Guidance (cat 3): Guidance on using Soliday", "https://npaid.sharepoint.com/sites/GLO-HR/SitePages/Workday(1).aspx?csf=1&web=1&share=ETOm1ySInUFLhxwcy8v0DQsBk86nyIwubgsLRNMWY2opPg&e=uSxW9c&CID=f25105d0-c16d-4d5a-a3ba-b425254fe27f"]], "gov": "Guidance (cat 3): Guidance on using Soliday", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_07", "code": "HR", "sub": null, "q": "Job analyses are created and documented.", "links": [["Handbook (cat 3): Recruitment process model", "https://cp.compendia.no/norsk-folkehjelp/expat-handbook/664106"]], "gov": "Policy (cat 2): Recruitment & Internal Mobility (currently under revision, September 2026) Handbook (cat 3): Recruitment process model", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_08", "code": "HR", "sub": null, "q": "Start-up meetings with relevant participants are held", "links": [["Handbook (cat 3): Recruitment process model", "https://cp.compendia.no/norsk-folkehjelp/expat-handbook/664106"]], "gov": "Handbook (cat 3): Recruitment process model", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_09", "code": "HR", "sub": null, "q": "Vacancies are advertised through Soliday (on internal or external vacancy page) Shortlisting is done in Soliday.", "links": [["Guidance (cat 3): Guidance on using Soliday", "https://npaid.sharepoint.com/sites/GLO-HR/SitePages/Workday(1).aspx?csf=1&web=1&share=ETOm1ySInUFLhxwcy8v0DQsBk86nyIwubgsLRNMWY2opPg&e=uSxW9c&CID=f25105d0-c16d-4d5a-a3ba-b425254fe27f"]], "gov": "Guidance (cat 3): Guidance on using Soliday", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_10", "code": "HR", "sub": null, "q": "Interviews are documented in Soliday.", "links": [["Guidance (cat 3): Guidance on using Soliday", "https://npaid.sharepoint.com/sites/GLO-HR/SitePages/Workday(1).aspx?csf=1&web=1&share=ETOm1ySInUFLhxwcy8v0DQsBk86nyIwubgsLRNMWY2opPg&e=uSxW9c&CID=f25105d0-c16d-4d5a-a3ba-b425254fe27f"]], "gov": "Guidance (cat 3): Guidance on using Soliday", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_11", "code": "HR", "sub": null, "q": "Potential reference checks are conducted and documented in Soliday.", "links": [["Guidance (cat 3): Guidance on using Soliday", "https://npaid.sharepoint.com/sites/GLO-HR/SitePages/Workday(1).aspx?csf=1&web=1&share=ETOm1ySInUFLhxwcy8v0DQsBk86nyIwubgsLRNMWY2opPg&e=uSxW9c&CID=f25105d0-c16d-4d5a-a3ba-b425254fe27f"]], "gov": "Guidance (cat 3): Guidance on using Soliday", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_12", "code": "HR", "sub": null, "q": "Final recruitment decision / nomination is documented in Soliday.", "links": [["Guidance (cat 3): Guidance on using Soliday", "https://npaid.sharepoint.com/sites/GLO-HR/SitePages/Workday(1).aspx?csf=1&web=1&share=ETOm1ySInUFLhxwcy8v0DQsBk86nyIwubgsLRNMWY2opPg&e=uSxW9c&CID=f25105d0-c16d-4d5a-a3ba-b425254fe27f"]], "gov": "Guidance (cat 3): Guidance on using Soliday", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_13", "code": "HR", "sub": null, "q": "Signed pre-employment documents (Contract and other documents - see onboarding section)", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "HR_14", "code": "HR", "sub": null, "q": "Have all candidates recruited to work with children, young people or at-risk groups shared a clean police certificate of good conduct?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "HR_15", "code": "HR", "sub": null, "q": "Confirm that new staff go through onboarding.", "links": [["Template (cat 4): Onboarding Plan Template", "https://npaid.sharepoint.com/:w:/r/sites/GLO-HR-Onboarding/_layouts/15/Doc.aspx?sourcedoc=%7B71AA1739-C43F-424F-8E80-CC4C5737EDD0%7D&file=Onboarding%20plan%20(ENG).docx&action=default&mobileredirect=true"]], "gov": "Template (cat 4): Onboarding Plan Template", "nogov": false, "hint": "", "coNote": "Onboarding Checklist; Code of Conduct; Safeguarding Policy; Conflict of Interest Declaration Form; Substance Abuse Policy; HSE Training Matrix"}, {"id": "HR_16", "code": "HR", "sub": null, "q": "Confirm that Code of Conduct acknowledgements are collected.", "links": [["Policy (cat 2): NPA Code of Conduct", "https://npaid.sharepoint.com/sites/HO-HR-Department/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FHO%2DHR%2DDepartment%2FShared%20Documents%2FCompliance%20Policy%20%26%20Procedures%2FCode%5Fof%5FConduct%5FProcedures%2FCoC%20Engelsk%2FNPA%20Code%20of%20Conduct%2Epdf&parent=%2Fsites%2FHO%2DHR%2DDepartment%2FShared%20Documents%2FCompliance%20Policy%20%26%20Procedures%2FCode%5Fof%5FConduct%5FProcedures%2FCoC%20Engelsk"]], "gov": "Policy (cat 2): NPA Code of Conduct", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_17", "code": "HR", "sub": null, "q": "Confirm that mandatory Safeguarding eLearning and annual in-person refresher training is completed.", "links": [["Policy (cat 2): NPA Safeguarding Policy", "https://npaid.sharepoint.com/:b:/s/KeyDocumentsinNPA/IQAWNkYca1-EToBUgq0xc_sIAUNQporVgZIqvellyAJA7Nc?e=ah4FEn"]], "gov": "Policy (cat 2): NPA Safeguarding Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_18", "code": "HR", "sub": null, "q": "Confirm that mandatory HSE training is completed.", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "HR_19", "code": "HR", "sub": null, "q": "Confirm that conflict-of-interest training is completed where relevant.", "links": [["Policy (cat 2): NPA Conflict of Interest Policy", "https://npaid.sharepoint.com/:b:/s/KeyDocumentsinNPA/IQDayQkuEy3GQrjWQIUshdoWAYjCcLohvSBUJVgX0jd42Dw?e=YDBBBC"]], "gov": "Policy (cat 2): NPA Conflict of Interest Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_20", "code": "HR", "sub": null, "q": "Confirm that substance abuse awareness is covered where relevant.", "links": [["Procedure (cat 3): Procedure for addressing substance abuse in NPA", "https://npaid.sharepoint.com/sites/HO-HR-Department/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FHO%2DHR%2DDepartment%2FShared%20Documents%2FCompliance%20Policy%20%26%20Procedures%2FProsedyre%20Rus%20og%20%2Dspillavhengighet%2FEngelsk%2FProcedure%2FProcedure%20for%20addressing%20Substance%20abuse%20NPA%2Epdf&parent=%2Fsites%2FHO%2DHR%2DDepartment%2FShared%20Documents%2FCompliance%20Policy%20%26%20Procedures%2FProsedyre%20Rus%20og%20%2Dspillavhengighet%2FEngelsk%2FProcedure"]], "gov": "Procedure (cat 3): Procedure for addressing substance abuse in NPA", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_21", "code": "HR", "sub": null, "q": "Confirm that sick time and absence is registered correctly in Soliday.", "links": [["Guidance (cat 3): Guidance on using Soliday", "https://npaid.sharepoint.com/sites/GLO-HR/SitePages/Workday(1).aspx?csf=1&web=1&share=ETOm1ySInUFLhxwcy8v0DQsBk86nyIwubgsLRNMWY2opPg&e=uSxW9c&CID=f25105d0-c16d-4d5a-a3ba-b425254fe27f"]], "gov": "Guidance (cat 3): Guidance on using Soliday", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_22", "code": "HR", "sub": null, "q": "Confirm that follow-up is completed in accordance with local labor law", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "HR_23", "code": "HR", "sub": null, "q": "Confirm that workplace adjustments are in line with local labor law and documented.", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "HR_24", "code": "HR", "sub": null, "q": "Confirm that return-to-work support is documented.", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "HR_25", "code": "HR", "sub": null, "q": "Confirm that PDDs are conducted using Soliday", "links": [["Guidance (cat 3): Guidance on using Soliday", "https://npaid.sharepoint.com/sites/GLO-HR/SitePages/Workday(1).aspx?csf=1&web=1&share=ETOm1ySInUFLhxwcy8v0DQsBk86nyIwubgsLRNMWY2opPg&e=uSxW9c&CID=f25105d0-c16d-4d5a-a3ba-b425254fe27f"]], "gov": "Guidance (cat 3): Guidance on using Soliday", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_26", "code": "HR", "sub": null, "q": "Confirm that agreed learning needs are followed up in regular check-ins between manager and employee", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "HR_27", "code": "HR", "sub": null, "q": "All employees have signed employment contracts which comply with local labour law and NPA requirements.", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "HR_28", "code": "HR", "sub": null, "q": "Compensation and Benefits ( Global salary policy finalized by the end of 2026 ) NEED INPUT FROM COMP & BEN", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "HR_29", "code": "HR", "sub": null, "q": "The Global salary policy is followed", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "Norsk Folkehjelp :: Global Staff and Management Handbook :: 9.1 Global salary policy", "coNote": "The Global Salary Policy"}, {"id": "HR_30", "code": "HR", "sub": null, "q": "A system for regular review of staff salaries, allowances and benefits is in place", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "HR_31", "code": "HR", "sub": null, "q": "Is the handling of severance pay according to local legislation and employee contracts?", "links": [], "gov": "link to calculation. Upload to HO SP", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_32", "code": "HR", "sub": null, "q": "Staff survey requirement", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "HR_33", "code": "HR", "sub": null, "q": "Have you consulted the Global Safeguarding Advisor to ensure appropriate questions are included in any staff surveys you have conducted?", "links": [["Policy (cat 2): NPA Safeguarding Policy", "https://npaid.sharepoint.com/:b:/s/KeyDocumentsinNPA/IQAWNkYca1-EToBUgq0xc_sIAUNQporVgZIqvellyAJA7Nc?e=ah4FEn"]], "gov": "Policy (cat 2): NPA Safeguarding Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "HR_34", "code": "HR", "sub": null, "q": "Have you applied appropriate disciplinary measures to all staff found in breach of the Safeguarding policy?", "links": [["Policy (cat 2): NPA Safeguarding Policy", "https://npaid.sharepoint.com/:b:/s/KeyDocumentsinNPA/IQAWNkYca1-EToBUgq0xc_sIAUNQporVgZIqvellyAJA7Nc?e=ah4FEn"]], "gov": "Policy (cat 2): NPA Safeguarding Policy", "nogov": false, "hint": "", "coNote": ""}, {"id": "FIN_01", "code": "FIN", "sub": "Financial Documentation, Banking and Cash Controls", "q": "Has all supporting documentation for transactions and balance sheet accounts been uploaded to Unit4 and made available for audit and HO review?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_02", "code": "FIN", "sub": "Financial Documentation, Banking and Cash Controls", "q": "Is the cash handling performed by a staff with no access to Unit 4?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_03", "code": "FIN", "sub": "Financial Documentation, Banking and Cash Controls", "q": "Do you have an updated authorisation table and is it uploaded to HO Sharepoint?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_04", "code": "FIN", "sub": "Financial Documentation, Banking and Cash Controls", "q": "Do you have an up to date bank signatory list and is it uploaded to HO Sharepoint?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_05", "code": "FIN", "sub": "Financial Documentation, Banking and Cash Controls", "q": "In the last twelve months; Are banks notified immediately when an authorized account signatory leaves NPA?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_06", "code": "FIN", "sub": "Financial Documentation, Banking and Cash Controls", "q": "In the last twelve months; are cash counts held regularly (minimum on a monthly basis)", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_07", "code": "FIN", "sub": "Financial Documentation, Banking and Cash Controls", "q": "Are cash stored in a secure way? Is there a separate cash journal/cash book for each cash box?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_08", "code": "FIN", "sub": "Financial Documentation, Banking and Cash Controls", "q": "Has the CD performed unannounced surprise cash counts at least two times a year for each cash box?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_09", "code": "FIN", "sub": "Financial Documentation, Banking and Cash Controls", "q": "Do you always issue a cash receipt, signed by both the cashier and the recipient of the cash for each payment and withdrawal in cash?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_10", "code": "FIN", "sub": "Financial Documentation, Banking and Cash Controls", "q": "Do you always apply Risk Mitigation Instructions for Payments", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_11", "code": "FIN", "sub": "Financial Documentation, Banking and Cash Controls", "q": "In the last twelve months; Are all monthly bank reconciliations approved and signed by the CD?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_12", "code": "FIN", "sub": "Financial Documentation, Banking and Cash Controls", "q": "In the last twelve months, have any TBRs been rated red?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_13", "code": "FIN", "sub": "Budget management and cash flow", "q": "Is budget accountability (responsibility) clearly delegated for all parts of the budget?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_14", "code": "FIN", "sub": "Budget management and cash flow", "q": "In the last twelve months; Do you have BvA meetings (budget vs actual) on a monthly basis?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_15", "code": "FIN", "sub": "Budget management and cash flow", "q": "Have any significant uncovered financial risks or funding gaps been identified for the next 12 months?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_16", "code": "FIN", "sub": "Budget management and cash flow", "q": "Do you have plans and procedures for managing cash flow in total (to ensure an adequate liquidity to cover expenses when they occur)?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_17", "code": "FIN", "sub": "Audit, controller visit recommendations and master action list", "q": "Have the recommendations from your previous year’s external audit been implemented?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_18", "code": "FIN", "sub": "Audit, controller visit recommendations and master action list", "q": "Have the recommendations from controller visits been implemented?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_19", "code": "FIN", "sub": "Audit, controller visit recommendations and master action list", "q": "Has findings on master action list been followed up?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_20", "code": "FIN", "sub": "Audit, controller visit recommendations and master action list", "q": "Does the country office have any unresolved cases related to fraud, financial irregularities, or donor compliance violations?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_21", "code": "FIN", "sub": "Audit, controller visit recommendations and master action list", "q": "Have periodic partner oversight reviews been conducted and documented, including review of audit reports and outstanding findings?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_22", "code": "FIN", "sub": "Exchange rate and payroll reported", "q": "Do you have a system in place for deviations on exchange rates?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}, {"id": "FIN_23", "code": "FIN", "sub": "Exchange rate and payroll reported", "q": "Has payroll been reconsiled and reported in accordance wtih local law?", "links": [], "gov": "No governing document identified. Identify and link relevant docs", "nogov": true, "hint": "", "coNote": ""}], "countries": [{"v": "afghanistan", "l": "Afghanistan"}, {"v": "angola", "l": "Angola"}, {"v": "bosnia_and_herzegovina", "l": "Bosnia and Herzegovina"}, {"v": "cambodia", "l": "Cambodia"}, {"v": "colombia", "l": "Colombia"}, {"v": "ecuador", "l": "Ecuador"}, {"v": "ethiopia", "l": "Ethiopia"}, {"v": "iraq", "l": "Iraq"}, {"v": "kosovo", "l": "Kosovo"}, {"v": "lao_pdr", "l": "Lao PDR"}, {"v": "lebanon", "l": "Lebanon"}, {"v": "mozambique", "l": "Mozambique"}, {"v": "myanmar", "l": "Myanmar"}, {"v": "palestine", "l": "Palestine"}, {"v": "peru", "l": "Peru"}, {"v": "rwanda", "l": "Rwanda"}, {"v": "south_sudan", "l": "South Sudan"}, {"v": "sudan", "l": "Sudan"}, {"v": "syria", "l": "Syria"}, {"v": "thailand", "l": "Thailand"}, {"v": "ukraine", "l": "Ukraine"}, {"v": "vietnam", "l": "Vietnam"}, {"v": "yemen", "l": "Yemen"}, {"v": "zimbabwe", "l": "Zimbabwe"}], "roles": [{"v": "country_director", "l": "Country Director"}, {"v": "deputy_country_director", "l": "Deputy Country Director"}, {"v": "finance_manager", "l": "Finance Manager"}, {"v": "hr_manager", "l": "HR Manager"}, {"v": "logistics_manager", "l": "Logistics Manager"}, {"v": "security_focal_point", "l": "Security Focal Point"}, {"v": "safeguarding_focal_point", "l": "Safeguarding Focal Point"}, {"v": "it_officer", "l": "IT Officer"}, {"v": "programme_manager", "l": "Programme Manager"}, {"v": "other", "l": "Other"}], "years": ["2025", "2026", "2027", "2028", "2029", "2030"], "responsible": {}};
+const ITEMS = DATA.items, SECTIONS = DATA.sections;
+const bySec = c => ITEMS.filter(i => i.code === c);
+const secName = s => `${s.num}-${s.name}`;
+const LABEL = {"1":"Not in compliance","2":"Partially in compliance","3":"Fully in compliance","na":"N/A"};
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const lbl = (list, v) => (list.find(x => x.v === v) || {}).l || v || "";
+const DEMO = !CONFIG.LAYER_URL;
+const docIcon = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 1.5h5.5L13 5v9.5H4z"/><path d="M9.5 1.5V5H13"/></svg>';
+
+/* ---------- safe storage ---------- */
+const mem = {};
+const LS = {
+  get(k){ try { const v = localStorage.getItem(k); return v == null ? (mem[k] ?? null) : JSON.parse(v); } catch(e){ return mem[k] ?? null; } },
+  set(k,v){ mem[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} },
+  del(k){ delete mem[k]; try { localStorage.removeItem(k); } catch(e){} }
+};
+function toast(m){ const t = document.getElementById("toast"); t.textContent = m; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 3000); }
+
+/* ---------- field lists ---------- */
+const DATE_FIELDS = new Set(["submitted_at", ...SECTIONS.map(s => s.code + "_edited_at")]);
+const ALL_FIELDS = ["country","assessment_year","respondent_role","respondent_name","respondent_email","submission_status","cd_comment",
+  "last_section","submitted_by","submitted_at","ho_review_status","ho_review_comment",
+  "total_red","total_amber","total_green","total_na","total_done","overall_avg","overall_rag"];
+ITEMS.forEach(i => ALL_FIELDS.push(i.id, i.id+"_comment"));
+SECTIONS.forEach(s => ["red","amber","green","na","done","avg","rag","edited_by","edited_at"].forEach(x => ALL_FIELDS.push(s.code+"_"+x)));
+
+/* ================= AUTH (ArcGIS OAuth 2.0 with PKCE) ================= */
+const Auth = {
+  get(){ return LS.get("coar-auth"); },
+  valid(){ const a = this.get(); return a && a.token && a.expires > Date.now() + 60000; },
+  async start(){
+    const verifier = b64url(crypto.getRandomValues(new Uint8Array(48)));
+    const challenge = b64url(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier))));
+    const state = b64url(crypto.getRandomValues(new Uint8Array(12)));
+    LS.set("coar-pkce", {verifier, state});
+    const url = `${CONFIG.PORTAL_URL}/sharing/rest/oauth2/authorize?` + new URLSearchParams({client_id:CONFIG.CLIENT_ID, response_type:"code", redirect_uri:CONFIG.REDIRECT_URI, code_challenge:challenge, code_challenge_method:"S256", state, expiration:"20160"});
+    if (window.top !== window.self) {            // inside SharePoint iframe: sign in through a popup
+      const w = window.open(url, "coar-login", "width=520,height=720");
+      if (!w) { renderSignIn("Your browser blocked the sign-in window. Allow pop-ups for this page and try again."); return; }
+    } else location.assign(url);
+  },
+  async exchange(code, state){
+    const p = LS.get("coar-pkce");
+    if (!p || p.state !== state) throw new Error("Sign-in could not be verified. Please try again.");
+    const r = await postForm(`${CONFIG.PORTAL_URL}/sharing/rest/oauth2/token`, {client_id:CONFIG.CLIENT_ID, grant_type:"authorization_code", code, redirect_uri:CONFIG.REDIRECT_URI, code_verifier:p.verifier});
+    LS.del("coar-pkce"); this.store(r);
+  },
+  async refresh(){
+    const a = this.get(); if (!a || !a.refresh) return false;
+    try { const r = await postForm(`${CONFIG.PORTAL_URL}/sharing/rest/oauth2/token`, {client_id:CONFIG.CLIENT_ID, grant_type:"refresh_token", refresh_token:a.refresh}); this.store({...r, refresh_token: r.refresh_token || a.refresh}); return true; }
+    catch(e){ return false; }
+  },
+  store(r){ LS.set("coar-auth", {token:r.access_token, expires:Date.now() + r.expires_in*1000, refresh:r.refresh_token, username:r.username}); },
+  async token(){ if (this.valid()) return this.get().token; if (await this.refresh()) return this.get().token; throw Object.assign(new Error("Your session has expired. Sign in again to keep saving."), {auth:true}); },
+  signOut(){ LS.del("coar-auth"); location.reload(); }
+};
+function b64url(bytes){ let s = ""; bytes.forEach(b => s += String.fromCharCode(b)); return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+async function postForm(url, params){
+  const res = await fetch(url, {method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:new URLSearchParams({f:"json", ...params})});
+  const j = await res.json();
+  if (j.error) { const e = new Error(j.error.message || "Request failed"); e.code = j.error.code; if (j.error.code === 498 || j.error.code === 499) e.auth = true; throw e; }
+  return j;
+}
+async function agsPost(url, params){ return postForm(url, {...params, token: await Auth.token()}); }
+
+/* ================= DATA STORES ================= */
+class ArcGISStore {
+  constructor(url){ this.url = url.replace(/\/$/, ""); }
+  async init(){
+    let info;
+    try { info = await agsPost(this.url, {}); }
+    catch(e) { if (e.auth) throw e; throw new Error("You don't have access to this country office's assessment, or its address in config.js is wrong. Ask HQ to check that you are in the right COAR group."); }
+    this.fields = {}; this.types = {};
+    info.fields.forEach(f => { this.fields[f.name.toLowerCase()] = f.name; this.types[f.name] = f.type; });
+    this.oid = info.objectIdField || (info.fields.find(f => f.type === "esriFieldTypeOID") || {}).name;
+    this.missing = ["country","assessment_year","submission_status",ITEMS[0].id,"last_section",SECTIONS[0].code+"_edited_by"].filter(f => !this.fields[f.toLowerCase()]);
+    if (this.missing.length) throw new Error("The layer is missing fields this form needs: " + this.missing.join(", ") + ". Republish the survey from the latest form spreadsheet.");
+  }
+  f(n){ return this.fields[n.toLowerCase()]; }
+  toLayer(attrs){ const o = {}; for (const [k,v] of Object.entries(attrs)) { const f = this.f(k); if (!f) continue;
+      if (this.types[f] === "esriFieldTypeDate") o[f] = v ? (typeof v === "number" ? v : Date.parse(v + "T12:00:00Z")) : null;
+      else if (/Integer|Double|Single/.test(this.types[f])) o[f] = (v === "" || v == null) ? null : Number(v);
+      else o[f] = v === "" ? null : v; }
+    return o; }
+  fromLayer(a){ const o = {}; ALL_FIELDS.forEach(k => { const f = this.f(k); if (!f) return; let v = a[f];
+      o[k] = v; }); return o; }
+  async find(country, year){
+    const where = `${this.f("country")}='${country.replace(/'/g,"''")}' AND ${this.f("assessment_year")}='${String(year).replace(/'/g,"''")}'`;
+    const r = await agsPost(this.url + "/query", {where, outFields:"*", orderByFields:this.oid + " ASC", returnGeometry:"false"});
+    const ft = r.features && r.features[0];
+    return ft ? {oid: ft.attributes[this.oid], attrs: this.fromLayer(ft.attributes)} : null;
+  }
+  async create(attrs){
+    const r = await agsPost(this.url + "/applyEdits", {adds: JSON.stringify([{attributes: this.toLayer(attrs)}])});
+    const x = r.addResults && r.addResults[0];
+    if (!x || !x.success) throw new Error((x && x.error && x.error.description) || "Could not create the assessment record.");
+    return x.objectId;
+  }
+  async update(oid, attrs){
+    const a = this.toLayer(attrs); a[this.oid] = oid;
+    const r = await agsPost(this.url + "/applyEdits", {updates: JSON.stringify([{attributes: a}])});
+    const x = r.updateResults && r.updateResults[0];
+    if (!x || !x.success) throw new Error((x && x.error && x.error.description) || "Save failed.");
+  }
+}
+class DemoStore {
+  constructor(){ this.key = "coar-demo-db"; if (!LS.get(this.key)) LS.set(this.key, seedDemo()); }
+  db(){ return LS.get(this.key); }
+  async init(){ await wait(250); }
+  async find(country, year){ await wait(300); const r = this.db().records.find(x => x.attrs.country === country && String(x.attrs.assessment_year) === String(year)); return r ? JSON.parse(JSON.stringify(r)) : null; }
+  async create(attrs){ await wait(300); const db = this.db(); const oid = db.next++; db.records.push({oid, attrs:{...attrs}}); LS.set(this.key, db); return oid; }
+  async update(oid, attrs){ await wait(450); if (APP.demoOffline) throw new Error("No connection"); const db = this.db(); const r = db.records.find(x => x.oid === oid); Object.assign(r.attrs, attrs); LS.set(this.key, db); }
+}
+const wait = ms => new Promise(r => setTimeout(r, ms));
+function seedDemo(){
+  const recs = []; let next = 1;
+  const mk = (country, year, secs, who, status) => {
+    const a = {country, assessment_year:year, submission_status:status, respondent_role:"country_director", respondent_name:who};
+    let seed = year * 7 + country.length;
+    const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    secs.forEach(code => { bySec(code).forEach(it => { const x = rnd(); const s = x < .15 ? "1" : x < .42 ? "2" : "3"; a[it.id] = s;
+        if (s !== "3") a[it.id+"_comment"] = "Partly documented"; });
+      Object.assign(a, calcSection(a, code)); a[code+"_edited_by"] = who; a[code+"_edited_at"] = Date.UTC(2026, 8, 24, 10, 15); });
+    Object.assign(a, calcTotals(a)); a.last_section = secs.length;
+    recs.push({oid: next++, attrs:a});
+  };
+  mk("bosnia_and_herzegovina", "2026", ["SMS","INT","DON","COM"], "Amra Hodžić", "draft");
+  mk("bosnia_and_herzegovina", "2025", SECTIONS.map(s => s.code), "Amra Hodžić", "submitted");
+  return {next, records: recs};
+}
+
+/* ================= SCORING ================= */
+function calcSection(a, code){
+  let r=0, am=0, g=0, na=0;
+  bySec(code).forEach(it => { const v = a[it.id]; if (v === "1") r++; else if (v === "2") am++; else if (v === "3") g++; else if (v === "na") na++; });
+  const n = r + am + g, avg = n ? Math.round((r + am*2 + g*3) / n * 100) / 100 : null;
+  return {[code+"_red"]:r, [code+"_amber"]:am, [code+"_green"]:g, [code+"_na"]:na, [code+"_done"]:r+am+g+na, [code+"_avg"]:avg, [code+"_rag"]:rag(avg)};
+}
+function calcTotals(a){
+  const t = {red:0, amber:0, green:0, na:0};
+  SECTIONS.forEach(s => { const c = calcSection(a, s.code); t.red += c[s.code+"_red"]; t.amber += c[s.code+"_amber"]; t.green += c[s.code+"_green"]; t.na += c[s.code+"_na"]; });
+  const n = t.red + t.amber + t.green, avg = n ? Math.round((t.red + t.amber*2 + t.green*3) / n * 100) / 100 : null;
+  return {total_red:t.red, total_amber:t.amber, total_green:t.green, total_na:t.na, total_done:n + t.na, overall_avg:avg, overall_rag:rag(avg)};
+}
+const rag = v => v == null ? "" : v >= 2.5 ? "Green" : v >= 1.75 ? "Amber" : "Red";
+const answered = (a, it) => a[it.id] != null && a[it.id] !== "";
+function secProgress(a, code){ const its = bySec(code); const c = calcSection(a, code); return {...c, n: its.length, done: c[code+"_done"], r:c[code+"_red"], am:c[code+"_amber"], g:c[code+"_green"], na:c[code+"_na"]}; }
+const fmtDate = ms => ms ? new Date(ms).toLocaleString(undefined, {day:"numeric", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"}) : "";
+
+/* ================= APP STATE ================= */
+const APP = { user:null, store:null, country:null, year:CONFIG.DEFAULT_YEAR, role:null, oid:null, rec:{}, prev:{}, pending:{}, sec:0,
+  saveState:"saved", lastSaved:null, timer:null, retry:null, saving:false, demoOffline:false, confirming:false, welcome:null };
+
+function readOnly(){ return APP.rec.submission_status === "submitted"; }
+function pendingKey(){ return `coar-pending:${APP.country}:${APP.year}`; }
+
+function setSave(state, text){
+  APP.saveState = state; const el = document.getElementById("savest"); el.hidden = false; el.dataset.s = state;
+  document.getElementById("savest-t").textContent = text || ({saved: APP.lastSaved ? "All changes saved · " + new Date(APP.lastSaved).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) : "All changes saved", saving:"Saving…", offline:"Not saved yet – offline, retrying", error:"Not saved – sign in again"})[state];
+}
+
+function setField(name, value, code){
+  if (readOnly()) return;
+  APP.rec[name] = value; APP.pending[name] = value;
+  if (code) {
+    const stamp = {[code+"_edited_by"]: APP.user.name, [code+"_edited_at"]: Date.now()};
+    Object.assign(APP.rec, stamp, calcSection(APP.rec, code)); Object.assign(APP.pending, stamp, calcSection(APP.rec, code));
+    const t = calcTotals(APP.rec); Object.assign(APP.rec, t); Object.assign(APP.pending, t);
+  }
+  LS.set(pendingKey(), APP.pending);
+  setSave("saving", "Unsaved changes…");
+  clearTimeout(APP.timer); APP.timer = setTimeout(flush, 1200);
+}
+
+async function flush(){
+  clearTimeout(APP.timer);
+  if (APP.saving) { APP.timer = setTimeout(flush, 800); return true; }
+  const batch = APP.pending; if (!Object.keys(batch).length) { if (APP.saveState !== "saved") setSave("saved"); return true; }
+  APP.pending = {}; APP.saving = true; setSave("saving");
+  try {
+    await APP.store.update(APP.oid, batch);
+    APP.lastSaved = Date.now(); APP.saving = false;
+    if (!Object.keys(APP.pending).length) { LS.del(pendingKey()); setSave("saved"); } else LS.set(pendingKey(), APP.pending);
+    clearTimeout(APP.retry); return true;
+  } catch(e) {
+    APP.saving = false; APP.pending = {...batch, ...APP.pending}; LS.set(pendingKey(), APP.pending);
+    if (e.auth) { setSave("error"); renderSignIn(e.message, true); return false; }
+    setSave("offline"); clearTimeout(APP.retry); APP.retry = setTimeout(flush, 15000); return false;
+  }
+}
+window.addEventListener("online", () => flush());
+window.addEventListener("beforeunload", e => { if (Object.keys(APP.pending).length || APP.saving) { e.preventDefault(); e.returnValue = ""; } });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flush(); });
+
+/* ================= SCREENS ================= */
+const $app = () => document.getElementById("app");
+
+function renderSignIn(msg, keepWork){
+  $app().innerHTML = `<div class="card">
+    <div><div class="eyebrow">Annual self-assessment</div><h1>Sign in to continue</h1></div>
+    <p>Use your organisation's ArcGIS account. Your answers are saved to the country office's assessment record as you go.</p>
+    ${msg ? `<p class="note ${keepWork ? "warn" : "err"}">${esc(msg)}${keepWork ? " Your unsaved answers are kept in this browser and will be saved after you sign in." : ""}</p>` : ""}
+    ${CONFIG.CLIENT_ID ? `<div><button class="btn pri" id="signin">Sign in with ArcGIS</button></div>` : `<p class="note err">This page is not configured yet: CLIENT_ID is empty. See the setup guide.</p>`}
+  </div>`;
+  const b = document.getElementById("signin"); if (b) b.onclick = () => Auth.start();
+}
+
+function renderStart(err){
+  const last = LS.get("coar-last") || {};
+  const country = APP.country || last.country || "";
+  const role = APP.role || last.role || "";
+  $app().innerHTML = `<div class="card">
+    <div><div class="eyebrow">Annual self-assessment</div><h1>Country Office Annual Requirements Checklist</h1></div>
+    <p>Choose your country office and the assessment year. If your office has already started, you continue where you left off. Answers are saved automatically, and several colleagues can work on different sections.</p>
+    ${DEMO ? `<p class="note">Demo mode: nothing is sent to ArcGIS; answers stay in this browser. Bosnia and Herzegovina has a draft already started, so you can see how resuming works.</p>` : ""}
+    ${err ? `<p class="note err">${esc(err)}</p>` : ""}
+    <div class="grid3">
+      <div class="fld"><label for="s-country">Country office</label><select id="s-country"><option value="">Select…</option>${DATA.countries.map(c => `<option value="${c.v}" ${c.v===country?"selected":""}>${esc(c.l)}</option>`).join("")}</select></div>
+      <div class="fld"><label for="s-year">Assessment year</label><select id="s-year">${DATA.years.map(y => `<option ${y===APP.year?"selected":""}>${y}</option>`).join("")}</select></div>
+      <div class="fld"><label for="s-role">Your role</label><select id="s-role"><option value="">Select…</option>${DATA.roles.map(r => `<option value="${r.v}" ${r.v===role?"selected":""}>${esc(r.l)}</option>`).join("")}</select></div>
+    </div>
+    <div><button class="btn pri" id="open">Open assessment</button></div>
+  </div>`;
+  document.getElementById("open").onclick = async () => {
+    const c = document.getElementById("s-country").value, y = document.getElementById("s-year").value, r = document.getElementById("s-role").value;
+    if (!c || !r) { renderStart("Select your country office and your role."); return; }
+    APP.country = c; APP.year = y; APP.role = r; LS.set("coar-last", {country:c, role:r});
+    document.getElementById("open").disabled = true; document.getElementById("open").textContent = "Opening…";
+    try { await openAssessment(); } catch(e) { if (e.auth) renderSignIn(e.message); else renderStart(e.message); }
+  };
+}
+
+async function openAssessment(){
+  const url = DEMO ? null : (CONFIG.COUNTRY_LAYER_URLS[APP.country] || CONFIG.LAYER_URL);
+  APP.store = DEMO ? new DemoStore() : new ArcGISStore(url);
+  await APP.store.init();
+  let rec = await APP.store.find(APP.country, APP.year);
+  let isNew = false;
+  if (!rec) {
+    const attrs = {country:APP.country, assessment_year:APP.year, submission_status:"draft", ho_review_status:"not_reviewed", respondent_role:APP.role, respondent_name:APP.user.name, respondent_email:APP.user.email, last_section:0};
+    await APP.store.create(attrs);
+    rec = await APP.store.find(APP.country, APP.year);   // re-read: if two people created at once, everyone uses the oldest record
+    isNew = true;
+  }
+  APP.oid = rec.oid; APP.rec = rec.attrs;
+  const prevRec = await APP.store.find(APP.country, String(Number(APP.year) - 1)).catch(() => null);
+  APP.prev = prevRec ? prevRec.attrs : {};
+  // restore anything that did not reach the server last time
+  const backup = LS.get(pendingKey());
+  APP.pending = {};
+  if (backup && Object.keys(backup).length && !readOnly()) { Object.assign(APP.rec, backup); APP.pending = {...backup}; }
+  const done = ITEMS.filter(it => answered(APP.rec, it)).length;
+  const firstOpen = SECTIONS.findIndex(s => secProgress(APP.rec, s.code).done < bySec(s.code).length);
+  const lastSec = Number(APP.rec.last_section);
+  APP.sec = readOnly() ? SECTIONS.length : (Number.isFinite(lastSec) && lastSec >= 0 && lastSec <= SECTIONS.length && APP.rec.last_section != null ? lastSec : Math.max(0, firstOpen));
+  const lastEdit = SECTIONS.map(s => ({t: APP.rec[s.code+"_edited_at"], by: APP.rec[s.code+"_edited_by"]})).filter(x => x.t).sort((a,b) => b.t - a.t)[0];
+  APP.welcome = isNew ? {isNew:true} : {done, lastEdit};
+  APP.lastSaved = Date.now();
+  if (!readOnly()) { APP.rec.respondent_role = APP.role; APP.pending.respondent_role = APP.role; APP.pending.respondent_name = APP.user.name; if (APP.user.email) APP.pending.respondent_email = APP.user.email; flush(); }
+  setSave(Object.keys(APP.pending).length ? "saving" : "saved");
+  document.getElementById("brand-sub").textContent = `${lbl(DATA.countries, APP.country)} · ${APP.year}`;
+  renderForm(); window.scrollTo({top:0});
+}
+
+function goSection(i){
+  APP.sec = Math.max(0, Math.min(SECTIONS.length, i)); APP.confirming = false; APP.welcome = null;
+  if (!readOnly()) { APP.rec.last_section = APP.sec; APP.pending.last_section = APP.sec; LS.set(pendingKey(), APP.pending); flush(); }
+  renderForm(); window.scrollTo({top:0});
+}
+
+function bars(p){ const t = p.n; const seg = (n, c) => n ? `<i style="width:${n/t*100}%;background:var(--${c})"></i>` : ""; return seg(p.r,"red") + seg(p.am,"amber") + seg(p.g,"green") + seg(p.na,"na"); }
+
+function renderForm(){
+  const a = APP.rec, ro = readOnly(), isReview = APP.sec === SECTIONS.length;
+  const done = ITEMS.filter(it => answered(a, it)).length, pct = Math.round(done / ITEMS.length * 100);
+  let welcome = "";
+  if (APP.welcome && !ro) welcome = APP.welcome.isNew
+    ? `<p class="note ok">A new ${esc(APP.year)} assessment was started for ${esc(lbl(DATA.countries, APP.country))}. Your answers save automatically; you can close this page and come back at any time.</p>`
+    : `<p class="note">Welcome back. ${APP.welcome.done} of ${ITEMS.length} requirements are answered${APP.welcome.lastEdit ? `; last change by ${esc(APP.welcome.lastEdit.by)} on ${fmtDate(APP.welcome.lastEdit.t)}` : ""}. You are in section ${Math.min(APP.sec + 1, SECTIONS.length)}.</p>`;
+  $app().innerHTML = `
+  ${DEMO ? `<div class="demo-bar"><b>Demo controls</b><label><input type="checkbox" id="d-off" ${APP.demoOffline?"checked":""}> Simulate lost connection</label><button class="linkbtn" id="d-reset" style="color:var(--accent)">Reset demo data</button><span>Reload the page to see the form resume where you left off.</span></div>` : ""}
+  <div class="form-grid">
+    <nav class="rail" aria-label="Sections">
+      <h3>Sections</h3>
+      ${SECTIONS.map((s, i) => { const p = secProgress(a, s.code);
+        return `<button data-go="${i}" aria-current="${i===APP.sec}"><span class="nm">${esc(secName(s))}</span><span class="ct">${p.done}/${p.n}</span><span class="minibar">${bars(p)}</span></button>`; }).join("")}
+      <button data-go="${SECTIONS.length}" aria-current="${isReview}"><span class="nm"><b>${ro ? "Summary" : "Review and submit"}</b></span><span class="ct">${pct}%</span></button>
+    </nav>
+    <div style="min-width:0">
+      <div class="hero">
+        <div class="hero-top">
+          <div><div class="eyebrow">${esc(lbl(DATA.countries, APP.country))} · ${esc(APP.year)} · ${esc(lbl(DATA.roles, APP.role))}</div><h1>Country Office Annual Requirements Checklist</h1></div>
+          <button class="btn" id="change">Change country or year</button>
+        </div>
+        ${ro ? `<p class="note ok">Submitted to HQ${a.submitted_by ? ` by ${esc(a.submitted_by)}` : ""}${a.submitted_at ? ` on ${fmtDate(a.submitted_at)}` : ""}. This assessment is now read-only. Contact HQ if it needs to be reopened.</p>` : welcome}
+        <div class="legend">
+          <span><i class="dot" style="background:var(--red)"></i>1 · Not in compliance</span>
+          <span><i class="dot" style="background:var(--amber)"></i>2 · Partially in compliance</span>
+          <span><i class="dot" style="background:var(--green)"></i>3 · Fully in compliance</span>
+          <span><i class="dot" style="background:var(--na)"></i>N/A · Does not apply this year</span>
+        </div>
+        <div class="progress"><span>${done} of ${ITEMS.length} answered</span><span class="bar"><i style="width:${pct}%"></i></span><span>${pct}%</span></div>
+      </div>
+      <div class="rail-sel fld"><label for="f-jump">Go to section</label><select id="f-jump">${SECTIONS.map((s, i) => { const p = secProgress(a, s.code); return `<option value="${i}" ${i===APP.sec?"selected":""}>${esc(secName(s))} (${p.done}/${p.n})</option>`; }).join("")}<option value="${SECTIONS.length}" ${isReview?"selected":""}>${ro ? "Summary" : "Review and submit"}</option></select></div>
+      ${isReview ? renderReview() : renderSection(SECTIONS[APP.sec])}
+    </div>
+  </div>`;
+  bindForm();
+}
+
+function renderSection(s){
+  const a = APP.rec, ro = readOnly(), p = secProgress(a, s.code);
+  let lastSub = null;
+  const html = bySec(s.code).map(it => {
+    let subH = ""; if (it.sub && it.sub !== lastSub) { subH = `<h3 class="sub-h">${esc(it.sub)}</h3>`; lastSub = it.sub; }
+    const v = a[it.id] || "", pv = APP.prev[it.id];
+    const docs = it.links.length ? it.links.map(([t,u]) => `<a class="doc" href="${esc(u)}" target="_blank" rel="noopener" title="${esc(t)}">${docIcon}<span>${esc(t)}</span></a>`).join("")
+      : `<span class="doc gap" title="${esc(it.gov)}">${docIcon}<span>${it.nogov ? "No governing document yet · HO to provide" : esc(it.gov)}</span></span>`;
+    const dis = ro ? "disabled" : "";
+    const follow = `<div class="follow one"><div class="fld"><label for="${it.id}_comment">Comments / link to evidence (optional)</label><input id="${it.id}_comment" data-f="${it.id}_comment" value="${esc(a[it.id+"_comment"])}" placeholder="Add a note or paste a SharePoint link to evidence" ${dis}></div></div>`;
+    return `${subH}<article class="q" data-s="${v}">
+      <div class="q-top"><span class="q-id mono">${it.id.replace("_","-")}</span><div class="q-text">${esc(it.q)}</div>${pv ? `<span class="prev">Last year: ${esc(pv === "na" ? "N/A" : pv)}</span>` : ""}</div>
+      ${it.hint ? `<div class="hint">Also tell us: ${esc(it.hint)}</div>` : ""}
+      <div class="docs">${docs}</div>
+      <div class="choices" role="group" aria-label="Score for ${it.id.replace("_","-")}">
+        ${["1","2","3"].map(x => `<button class="ch" data-v="${x}" data-id="${it.id}" aria-pressed="${v===x}" ${dis}><b>${x}</b><small>${LABEL[x]}</small></button>`).join("")}
+        <button class="ch" data-v="na" data-id="${it.id}" aria-pressed="${v==="na"}" ${dis}><small>N/A</small></button>
+      </div>
+      ${follow}
+    </article>`;
+  }).join("");
+  const ed = a[s.code+"_edited_by"] ? `Last edited by ${esc(a[s.code+"_edited_by"])} · ${fmtDate(a[s.code+"_edited_at"])}` : "Not started yet";
+  return `<div class="sec-head"><div><div class="eyebrow">Section ${s.num} of ${SECTIONS.length} · Suggested respondent: ${esc(s.respondent)}</div><h2>${esc(secName(s))}</h2><div class="edited">${ed}</div></div>
+    <div class="legend">${p.r?`<span class="pill r">${p.r} red</span>`:""}${p.am?`<span class="pill a">${p.am} amber</span>`:""}${p.g?`<span class="pill g">${p.g} green</span>`:""}${p.n-p.done?`<span class="pill n">${p.n-p.done} to answer</span>`:""}</div></div>
+    ${html}
+    <div class="nav-btns">
+      <button class="btn" data-go="${APP.sec-1}" ${APP.sec===0?"disabled":""}>← Previous section</button>
+      ${ro ? "" : `<button class="btn" id="savenow">Save now</button>`}
+      <button class="btn pri" data-go="${APP.sec+1}">${APP.sec===SECTIONS.length-1 ? (ro ? "Summary →" : "Review and submit →") : "Next section →"}</button>
+    </div>`;
+}
+
+function renderReview(){
+  const a = APP.rec, ro = readOnly();
+  const done = ITEMS.filter(it => answered(a, it)).length, unanswered = ITEMS.filter(it => !answered(a, it));
+  const canSubmit = CONFIG.SUBMIT_ROLES.includes(APP.role), complete = !unanswered.length;
+  const jump = list => list.slice(0, 12).map(it => `<button class="jump" data-goitem="${it.code}">${it.id.replace("_","-")}</button>`).join(", ") + (list.length > 12 ? ` and ${list.length - 12} more` : "");
+  const ov = a.overall_avg, rc = {Green:"g", Amber:"a", Red:"r"}[rag(ov)] || "n";
+  return `<div class="sec-head"><div><div class="eyebrow">${ro ? "Submitted assessment" : "Final step"}</div><h2>${ro ? "Summary" : "Review and submit"}</h2></div>
+    <span class="pill ${rc}">Overall ${ov != null ? Number(ov).toFixed(1) : "–"}${rag(ov) ? " · " + rag(ov) : ""}</span></div>
+    ${!ro && unanswered.length ? `<p class="note warn">${unanswered.length} ${unanswered.length===1?"requirement is":"requirements are"} not answered yet: ${jump(unanswered)}</p>` : ""}
+    <div class="review">${SECTIONS.map((s, i) => { const p = secProgress(a, s.code);
+      return `<div class="rv-row"><div><b>${esc(secName(s))}</b><div class="edited">${p.done}/${p.n} answered${a[s.code+"_edited_by"] ? ` · ${esc(a[s.code+"_edited_by"])}, ${fmtDate(a[s.code+"_edited_at"])}` : ""}</div></div>
+        <div class="stack">${bars(p)}</div><button class="btn" data-go="${i}">${ro ? "View" : p.done === p.n ? "Edit" : "Continue"}</button></div>`; }).join("")}</div>
+    <div class="fld" style="margin-top:16px"><label for="cd_comment">Country Director's overall comment (optional)</label><textarea id="cd_comment" data-f="cd_comment" ${ro?"disabled":""}>${esc(a.cd_comment)}</textarea></div>
+    ${ro ? "" : APP.confirming ? `<div class="confirm" style="margin-top:16px"><b>Submit the ${esc(APP.year)} assessment for ${esc(lbl(DATA.countries, APP.country))} to HQ?</b><span class="muted">After submitting, the form becomes read-only for the country office. HQ can reopen it if something needs correcting.</span><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn pri" id="do-submit">Yes, submit to HQ</button><button class="btn" id="cancel-submit">Cancel</button></div></div>`
+      : `<div class="nav-btns"><button class="btn" data-go="${SECTIONS.length-1}">← Back</button>
+        ${canSubmit ? `<button class="btn pri" id="submit" ${complete ? "" : "disabled"}>Submit to HQ</button>` : `<span class="muted" style="align-self:center">Your answers are saved. The Country Director submits the assessment to HQ.</span>`}</div>
+        ${canSubmit && !complete ? `<p class="muted" style="font-size:.84rem;text-align:right">Submit becomes available when every requirement is answered.</p>` : ""}`}`;
+}
+
+function bindForm(){
+  const root = $app();
+  root.querySelectorAll("[data-go]").forEach(b => b.onclick = () => goSection(+b.dataset.go));
+  root.querySelectorAll("[data-goitem]").forEach(b => b.onclick = () => goSection(SECTIONS.findIndex(s => s.code === b.dataset.goitem)));
+  root.querySelectorAll(".ch").forEach(b => b.onclick = () => {
+    const id = b.dataset.id, val = b.dataset.v, cur = APP.rec[id];
+    const code = ITEMS.find(i => i.id === id).code;
+    setField(id, cur === val ? null : val, code);
+    const y = b.getBoundingClientRect().top; APP.welcome = null; renderForm();
+    const nb = document.querySelector(`.ch[data-id="${id}"][data-v="${val}"]`); if (nb) window.scrollBy(0, nb.getBoundingClientRect().top - y);
+  });
+  root.querySelectorAll("[data-f]").forEach(el => {
+    const f = el.dataset.f, it = ITEMS.find(i => f.startsWith(i.id + "_"));
+    const h = () => setField(f, el.value, it ? it.code : null);
+    el.addEventListener(el.tagName === "SELECT" || el.type === "date" ? "change" : "input", h);
+  });
+  const on = (id, ev, fn) => { const el = document.getElementById(id); if (el) el[ev] = fn; };
+  on("f-jump", "onchange", e => goSection(+e.target.value));
+  on("savenow", "onclick", async () => { const ok = await flush(); toast(ok ? "Saved" : "Could not save yet – your answers are kept and will be sent when the connection is back"); });
+  on("change", "onclick", async () => { await flush(); renderStart(); });
+  on("submit", "onclick", () => { APP.confirming = true; renderForm(); });
+  on("cancel-submit", "onclick", () => { APP.confirming = false; renderForm(); });
+  on("do-submit", "onclick", async () => {
+    const btn = document.getElementById("do-submit"); btn.disabled = true; btn.textContent = "Submitting…";
+    Object.assign(APP.pending, {submission_status:"submitted", submitted_by:APP.user.name, submitted_at:Date.now()});
+    const ok = await flush();
+    if (ok) { Object.assign(APP.rec, {submission_status:"submitted", submitted_by:APP.user.name, submitted_at:Date.now()}); APP.confirming = false; renderForm(); toast("Submitted to HQ"); }
+    else { delete APP.pending.submission_status; delete APP.pending.submitted_by; delete APP.pending.submitted_at; btn.disabled = false; btn.textContent = "Yes, submit to HQ"; toast("Could not submit – check your connection and try again"); }
+  });
+  on("d-off", "onchange", e => { APP.demoOffline = e.target.checked; if (!e.target.checked) flush(); });
+  on("d-reset", "onclick", () => { LS.del("coar-demo-db"); LS.del(pendingKey()); LS.del("coar-last"); APP.country = null; APP.role = null; APP.pending = {}; renderStart(); document.getElementById("savest").hidden = true; });
+}
+
+/* ================= BOOT ================= */
+async function boot(){
+  if (DEMO) {
+    document.getElementById("demo-chip").hidden = false;
+    APP.user = {name:"Demo user", email:"", username:"demo"};
+    document.getElementById("who").textContent = "Demo user";
+    renderStart(); return;
+  }
+  const q = new URLSearchParams(location.search);
+  if (q.get("code") || q.get("error")) {
+    if (window.opener && window.opener !== window) {        // popup: hand the result to the page inside SharePoint
+      try { window.opener.postMessage({type:"coar-auth", code:q.get("code"), state:q.get("state"), error:q.get("error_description")}, location.origin); } catch(e){}
+      document.body.innerHTML = "<p style='font-family:sans-serif;padding:24px'>Signed in. You can close this window.</p>"; window.close(); return;
+    }
+    history.replaceState(null, "", location.pathname);
+    if (q.get("error")) { renderSignIn(q.get("error_description") || "Sign-in was cancelled."); return; }
+    try { await Auth.exchange(q.get("code"), q.get("state")); } catch(e) { renderSignIn(e.message); return; }
+  }
+  if (!Auth.valid() && !(await Auth.refresh())) { renderSignIn(); return; }
+  await afterSignIn();
+}
+async function afterSignIn(){
+  try {
+    const me = await agsPost(`${CONFIG.PORTAL_URL}/sharing/rest/community/self`, {});
+    APP.user = {name: me.fullName || me.username, email: me.email || "", username: me.username};
+  } catch(e) { renderSignIn(e.message); return; }
+  document.getElementById("who").innerHTML = `${esc(APP.user.name)} · <button class="linkbtn" id="signout">Sign out</button>`;
+  document.getElementById("signout").onclick = async () => { await flush(); Auth.signOut(); };
+  if (APP.oid) { flush(); renderForm(); } else renderStart();
+}
+window.addEventListener("message", async e => {
+  if (e.origin !== location.origin || !e.data || e.data.type !== "coar-auth") return;
+  if (e.data.error || !e.data.code) { renderSignIn(e.data.error || "Sign-in was cancelled."); return; }
+  try { await Auth.exchange(e.data.code, e.data.state); await afterSignIn(); } catch(err) { renderSignIn(err.message); }
+});
+boot();
+</script>
+
+</body>
+</html>
