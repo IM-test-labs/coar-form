@@ -193,8 +193,17 @@ table.hm:not(.tr){min-width:940px}
 .dn-tab td{padding:4px 8px;border-bottom:1px solid var(--line)}
 .dn-tab td:first-child{display:flex;align-items:center;gap:8px}
 .num{text-align:right;font-variant-numeric:tabular-nums}
-.att{list-style:none;margin:0;padding:0;display:grid;gap:8px;max-height:300px;overflow:auto;font-size:.86rem}
-.att li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.att-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.att-tab{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:var(--surface);border-radius:99px;padding:5px 12px;font-size:.82rem;font-weight:600;cursor:pointer}
+.att-tab b{font-variant-numeric:tabular-nums}
+.att-tab.r[aria-selected="true"]{border-color:var(--red);background:var(--red-soft);color:var(--red)}
+.att-tab.a[aria-selected="true"]{border-color:var(--amber);background:var(--amber-soft);color:var(--fg)}
+.att-list{max-height:340px;overflow:auto;display:grid;gap:12px;padding-right:4px}
+.att-h{font-size:.78rem;font-weight:700;color:var(--accent);margin-bottom:4px}
+.att{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:.86rem}
+.att li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:6px 10px;border-radius:6px;border-left:4px solid var(--line)}
+.att li.att-r{border-left-color:var(--red);background:var(--red-soft)}
+.att li.att-a{border-left-color:var(--amber);background:var(--amber-soft)}
 .sec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
 .sec-card{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:10px}
 .sc-t{display:grid;gap:3px;font-size:.78rem;min-width:0}
@@ -795,6 +804,9 @@ function renderDash(){
   on("d-country", e => { DASH.country = e.target.value; renderDash(); });
   on("d-year", e => { DASH.year = e.target.value; renderDash(); });
   document.getElementById("d-refresh").onclick = async () => { DASH.data = null; renderDash(); };
+  root.querySelectorAll("[data-att]").forEach(b => b.onclick = () => { DASH.attTab = b.dataset.att;
+    root.querySelectorAll("[data-att]").forEach(x => x.setAttribute("aria-selected", x === b));
+    root.querySelectorAll("[data-list]").forEach(l => l.hidden = l.dataset.list !== b.dataset.att); });
   root.querySelectorAll("tr[data-c]").forEach(tr => tr.onclick = () => { DASH.country = tr.dataset.c; DASH.mode = "country"; renderDash(); window.scrollTo({top:0}); });
 }
 
@@ -836,8 +848,14 @@ function viewCountry(){
       <div class="panel"><h2>All requirements</h2><p class="sub">Share of the ${n} requirements by score.</p>
         <div class="dn-big">${donut(segsOf(overallSt, "All sections"), n, 200, 30, fp(ov), "compliance")}
           <table class="dn-tab"><tbody>${[["red","1 · Not in compliance",t.total_red],["amber","2 · Partially",t.total_amber],["green","3 · Fully",t.total_green],["na","N/A",t.total_na],["empty","Not answered",n - answered]].map(([cc, l, v]) => `<tr><td><i class="dot" style="background:var(--${cc})${cc === "empty" ? ";outline:1px solid var(--line)" : ""}"></i>${l}</td><td class="num">${v}</td><td class="num muted">${pct(v, n)}%</td></tr>`).join("")}</tbody></table></div></div>
-      <div class="panel"><h2>Needs attention</h2><p class="sub">${reds.length} requirement${reds.length === 1 ? "" : "s"} scored 1 · Not in compliance${ambers.length ? `, ${ambers.length} scored 2` : ""}.</p>
-        <ul class="att">${reds.slice(0, 40).map(it => `<li><span class="mono q-id">${it.id.replace("_","-")}</span><div><div>${esc(it.q)}</div>${a[it.id + "_comment"] ? `<div class="hint">“${esc(a[it.id + "_comment"])}”</div>` : ""}</div></li>`).join("") || `<li class="muted">No requirements scored 1.</li>`}</ul></div>
+      <div class="panel"><h2>Needs attention</h2><p class="sub">Requirements scored 1 or 2, grouped by section.</p>
+        <div class="att-tabs" role="tablist">
+          <button role="tab" class="att-tab r" data-att="r" aria-selected="${DASH.attTab !== "a"}"><i class="dot" style="background:var(--red)"></i>Not in compliance <b>${reds.length}</b></button>
+          <button role="tab" class="att-tab a" data-att="a" aria-selected="${DASH.attTab === "a"}"><i class="dot" style="background:var(--amber)"></i>Partially in compliance <b>${ambers.length}</b></button>
+        </div>
+        ${[["r", reds, "1"], ["a", ambers, "2"]].map(([k, list, sc]) => `<div class="att-list" data-list="${k}" ${(DASH.attTab === "a") === (k === "a") ? "" : "hidden"}>${list.length ? SECTIONS.filter(s => list.some(it => it.code === s.code)).map(s => { const its = list.filter(it => it.code === s.code);
+          return `<div class="att-sec"><div class="att-h">${esc(secName(s))} <span class="muted">· ${its.length}</span></div><ul class="att">${its.map(it => `<li class="att-${k}"><span class="mono q-id">${it.id.replace("_","-")}</span><div><div>${esc(it.q)}</div>${a[it.id + "_comment"] ? `<div class="hint">“${esc(a[it.id + "_comment"])}”</div>` : ""}</div></li>`).join("")}</ul></div>`; }).join("") : `<p class="muted">No requirements scored ${sc}.</p>`}</div>`).join("")}
+      </div>
     </div>
     <div class="panel" style="margin-top:16px"><div class="panel-head"><div><h2>Scores by section</h2><p class="sub">Each ring shows the share of the section's requirements by score; the percentage is the section's compliance.</p></div>${legend()}</div>
       <div class="sec-grid">${SECTIONS.map(s => { const st = calcSection(a, s.code), m = bySec(s.code).length, v = st[s.code+"_avg"], ps = prev ? calcSection(prev, s.code)[s.code+"_avg"] : null, d = (v != null && ps != null) ? v - ps : null;
