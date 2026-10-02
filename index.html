@@ -144,6 +144,68 @@ a.doc:hover{border-color:var(--accent);color:var(--accent)}
 .demo-bar label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:8px;font-size:.88rem;z-index:50;max-width:calc(100% - 32px)}
 
+
+/* tabs + dashboard */
+.vtabs{display:flex;gap:4px;background:rgba(0,0,0,.18);padding:3px;border-radius:8px}
+.vtabs button{border:0;background:transparent;color:inherit;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:600;font-size:.85rem}
+.vtabs button[aria-selected="true"]{background:var(--accent-fg);color:var(--accent)}
+.dash-head{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.dash-head h1{font-size:1.4rem}
+.filters{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:16px}
+.filters .fld{min-width:200px}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:transparent;padding:8px 14px;font-size:.86rem;cursor:pointer;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:4px;align-content:start}
+.kpi .v{font-size:1.75rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi .v small{font-size:1rem;color:var(--muted);font-weight:500}
+.kpi .l{font-size:.8rem;color:var(--muted)}
+.kpi .s{font-size:.78rem;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill.x{background:var(--na-soft);color:var(--muted)}
+.delta{font-weight:700;font-size:.78rem;color:var(--muted);white-space:nowrap}
+.delta.up{color:var(--green)} .delta.down{color:var(--red)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.panel h2{font-size:1rem;margin-bottom:2px}
+.panel .sub{font-size:.8rem;color:var(--muted);margin:0 0 12px}
+.panel-head{display:flex;justify-content:space-between;align-items:start;gap:12px;flex-wrap:wrap}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.hm-scroll{overflow-x:auto}
+table.hm{border-collapse:separate;border-spacing:3px;font-size:.8rem;width:100%}
+table.hm:not(.tr){min-width:940px}
+.hm th{font-weight:600;color:var(--muted);font-size:.7rem;text-align:center;vertical-align:bottom;padding:2px}
+.hm th.cn{text-align:left}
+.hm th .full{display:block;font-weight:400;font-size:.64rem;line-height:1.15;max-width:62px;margin:0 auto}
+.hm td{height:30px;text-align:center;border-radius:4px;font-variant-numeric:tabular-nums;font-weight:600;min-width:40px}
+.hm td.cname{text-align:left;font-weight:500;white-space:nowrap;padding:0 8px;min-width:170px}
+.hm tr[data-c]{cursor:pointer}
+.hm tr[data-c]:hover td.cname{color:var(--accent)}
+.hm td.ov{box-shadow:inset 0 0 0 2px var(--fg)}
+.hm td.chg{font-weight:400}
+.st{font-size:.68rem;font-weight:600;margin-left:6px;color:var(--muted)}
+.c-r{background:var(--red);color:var(--on-solid)} .c-a{background:var(--amber);color:var(--amber-fg)} .c-g{background:var(--green);color:var(--on-solid)} .c-x{background:var(--empty);color:var(--muted);font-weight:400}
+.donut{display:block;flex:none;overflow:visible}
+.donut circle[data-tip]{cursor:default}
+.dn-c{font-weight:700;fill:var(--fg);font-variant-numeric:tabular-nums}
+.dn-s{fill:var(--muted)}
+.dn-big{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.dn-tab{border-collapse:collapse;font-size:.86rem}
+.dn-tab td{padding:4px 8px;border-bottom:1px solid var(--line)}
+.dn-tab td:first-child{display:flex;align-items:center;gap:8px}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.att{list-style:none;margin:0;padding:0;display:grid;gap:8px;max-height:300px;overflow:auto;font-size:.86rem}
+.att li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.sec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.sec-card{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:10px}
+.sc-t{display:grid;gap:3px;font-size:.78rem;min-width:0}
+.sc-t b{font-size:.84rem}
+.lc{width:100%;height:auto;display:block}
+.lc .grid{stroke:var(--line);stroke-width:1}
+.lc .ax{fill:var(--muted);font-size:12px}
+.lc .lbl{fill:var(--fg);font-size:13px;font-weight:700}
+.tip{position:fixed;z-index:60;pointer-events:none;background:var(--fg);color:var(--bg);font-size:.8rem;padding:6px 10px;border-radius:6px;max-width:320px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+@media (max-width:980px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:620px){.vtabs button{padding:6px 8px;font-size:.78rem}.filters{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.filters .seg{grid-column:1/-1}.filters .fld{min-width:0}.seg button{flex:1;padding:8px 6px}.kpis{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 @media (max-width:980px){
   .form-grid{grid-template-columns:minmax(0,1fr)}
   .rail{display:none}
@@ -170,6 +232,7 @@ a.doc:hover{border-color:var(--accent);color:var(--accent)}
 <header class="top">
   <div class="top-in">
     <div class="brand"><b>Country Office Annual Requirements</b><span id="brand-sub">Annual self-assessment</span></div>
+    <nav class="vtabs" role="tablist"><button role="tab" id="tab-form" aria-selected="true">Assessment form</button><button role="tab" id="tab-dash" aria-selected="false">HO dashboard</button></nav>
     <span class="savest" id="savest" data-s="saved" hidden><i></i><span id="savest-t">All changes saved</span></span>
     <span class="who" id="who"></span>
     <span class="demo-chip" id="demo-chip" hidden>Demo mode</span>
@@ -177,6 +240,7 @@ a.doc:hover{border-color:var(--accent);color:var(--accent)}
 </header>
 <main class="wrap" id="app"></main>
 <div class="toast" id="toast" hidden></div>
+<div class="tip" id="tip" hidden></div>
 
 <script>window.COAR_EXPECT_CONFIG = true; document.write('<script src="config.js?t=' + Date.now() + '" onerror="window.COAR_CONFIG_MISSING = true"><\/script>');</script>
 <script>
@@ -268,7 +332,7 @@ class ArcGISStore {
   async init(){
     let info;
     try { info = await agsPost(this.url, {}); }
-    catch(e) { if (e.auth) throw e; throw new Error("You don't have access to this country office's assessment, or its address in config.js is wrong. Ask HQ to check that you are in the right COAR group."); }
+    catch(e) { if (e.auth) throw e; throw new Error("You don't have access to this country office's assessment, or its address in config.js is wrong. Ask HO to check that you are in the right COAR group."); }
     this.fields = {}; this.types = {};
     info.fields.forEach(f => { this.fields[f.name.toLowerCase()] = f.name; this.types[f.name] = f.type; });
     this.oid = info.objectIdField || (info.fields.find(f => f.type === "esriFieldTypeOID") || {}).name;
@@ -283,6 +347,15 @@ class ArcGISStore {
     return o; }
   fromLayer(a){ const o = {}; ALL_FIELDS.forEach(k => { const f = this.f(k); if (!f) return; let v = a[f];
       o[k] = v; }); return o; }
+  async findAll(){
+    const out = []; let offset = 0;
+    for (;;) {
+      const r = await agsPost(this.url + "/query", {where:"1=1", outFields:"*", orderByFields:this.oid + " ASC", returnGeometry:"false", resultOffset:String(offset), resultRecordCount:"1000"});
+      (r.features || []).forEach(f => out.push(this.fromLayer(f.attributes)));
+      if (!r.exceededTransferLimit || !(r.features || []).length) break; offset += r.features.length;
+    }
+    return out;
+  }
   async find(country, year){
     const where = `${this.f("country")}='${country.replace(/'/g,"''")}' AND ${this.f("assessment_year")}='${String(year).replace(/'/g,"''")}'`;
     const r = await agsPost(this.url + "/query", {where, outFields:"*", orderByFields:this.oid + " ASC", returnGeometry:"false"});
@@ -491,7 +564,7 @@ function renderForm(){
           <div><div class="eyebrow">${esc(lbl(DATA.countries, APP.country))} · ${esc(APP.year)} · ${esc(lbl(DATA.roles, APP.role))}</div><h1>Country Office Annual Requirements Checklist</h1></div>
           <button class="btn" id="change">Change country or year</button>
         </div>
-        ${ro ? `<p class="note ok">Submitted to HQ${a.submitted_by ? ` by ${esc(a.submitted_by)}` : ""}${a.submitted_at ? ` on ${fmtDate(a.submitted_at)}` : ""}. This assessment is now read-only. Contact HQ if it needs to be reopened.</p>` : welcome}
+        ${ro ? `<p class="note ok">Submitted to HO${a.submitted_by ? ` by ${esc(a.submitted_by)}` : ""}${a.submitted_at ? ` on ${fmtDate(a.submitted_at)}` : ""}. This assessment is now read-only. Contact HO if it needs to be reopened.</p>` : welcome}
         <div class="legend">
           <span><i class="dot" style="background:var(--red)"></i>1 · Not in compliance</span>
           <span><i class="dot" style="background:var(--amber)"></i>2 · Partially in compliance</span>
@@ -552,9 +625,9 @@ function renderReview(){
       return `<div class="rv-row"><div><b>${esc(secName(s))}</b><div class="edited">${p.done}/${p.n} answered${a[s.code+"_edited_by"] ? ` · ${esc(a[s.code+"_edited_by"])}, ${fmtDate(a[s.code+"_edited_at"])}` : ""}</div></div>
         <div class="stack">${bars(p)}</div><button class="btn" data-go="${i}">${ro ? "View" : p.done === p.n ? "Edit" : "Continue"}</button></div>`; }).join("")}</div>
     <div class="fld" style="margin-top:16px"><label for="cd_comment">Country Director's overall comment (optional)</label><textarea id="cd_comment" data-f="cd_comment" ${ro?"disabled":""}>${esc(a.cd_comment)}</textarea></div>
-    ${ro ? "" : APP.confirming ? `<div class="confirm" style="margin-top:16px"><b>Submit the ${esc(APP.year)} assessment for ${esc(lbl(DATA.countries, APP.country))} to HQ?</b><span class="muted">After submitting, the form becomes read-only for the country office. HQ can reopen it if something needs correcting.</span><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn pri" id="do-submit">Yes, submit to HQ</button><button class="btn" id="cancel-submit">Cancel</button></div></div>`
+    ${ro ? "" : APP.confirming ? `<div class="confirm" style="margin-top:16px"><b>Submit the ${esc(APP.year)} assessment for ${esc(lbl(DATA.countries, APP.country))} to HO?</b><span class="muted">After submitting, the form becomes read-only for the country office. HO can reopen it if something needs correcting.</span><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn pri" id="do-submit">Yes, submit to HO</button><button class="btn" id="cancel-submit">Cancel</button></div></div>`
       : `<div class="nav-btns"><button class="btn" data-go="${SECTIONS.length-1}">← Back</button>
-        ${canSubmit ? `<button class="btn pri" id="submit" ${complete ? "" : "disabled"}>Submit to HQ</button>` : `<span class="muted" style="align-self:center">Your answers are saved. The Country Director submits the assessment to HQ.</span>`}</div>
+        ${canSubmit ? `<button class="btn pri" id="submit" ${complete ? "" : "disabled"}>Submit to HO</button>` : `<span class="muted" style="align-self:center">Your answers are saved. The Country Director submits the assessment to HO.</span>`}</div>
         ${canSubmit && !complete ? `<p class="muted" style="font-size:.84rem;text-align:right">Submit becomes available when every requirement is answered.</p>` : ""}`}`;
 }
 
@@ -584,14 +657,219 @@ function bindForm(){
     const btn = document.getElementById("do-submit"); btn.disabled = true; btn.textContent = "Submitting…";
     Object.assign(APP.pending, {submission_status:"submitted", submitted_by:APP.user.name, submitted_at:Date.now()});
     const ok = await flush();
-    if (ok) { Object.assign(APP.rec, {submission_status:"submitted", submitted_by:APP.user.name, submitted_at:Date.now()}); APP.confirming = false; renderForm(); toast("Submitted to HQ"); }
-    else { delete APP.pending.submission_status; delete APP.pending.submitted_by; delete APP.pending.submitted_at; btn.disabled = false; btn.textContent = "Yes, submit to HQ"; toast("Could not submit – check your connection and try again"); }
+    if (ok) { Object.assign(APP.rec, {submission_status:"submitted", submitted_by:APP.user.name, submitted_at:Date.now()}); APP.confirming = false; renderForm(); toast("Submitted to HO"); }
+    else { delete APP.pending.submission_status; delete APP.pending.submitted_by; delete APP.pending.submitted_at; btn.disabled = false; btn.textContent = "Yes, submit to HO"; toast("Could not submit – check your connection and try again"); }
   });
   on("d-off", "onchange", e => { APP.demoOffline = e.target.checked; if (!e.target.checked) flush(); });
   on("d-reset", "onclick", () => { LS.del("coar-demo-db"); LS.del(pendingKey()); LS.del("coar-last"); APP.country = null; APP.role = null; APP.pending = {}; renderStart(); document.getElementById("savest").hidden = true; });
 }
 
+/* ================= HO DASHBOARD ================= */
+const DASH = {mode:"overview", year:CONFIG.DEFAULT_YEAR, country:null, data:null, loadedAt:null, error:null};
+const SEC_COLOR = {r:"red", am:"amber", g:"green", na:"na"};
+const pct = (n, d) => d ? Math.round(n / d * 100) : 0;
+const ragClass = v => ({Green:"g", Amber:"a", Red:"r"})[rag(v)] || "x";
+
+async function loadDash(force){
+  if (DASH.data && !force) return;
+  DASH.error = null;
+  try {
+    let recs;
+    if (DEMO) recs = demoDashData();
+    else { const st = new ArcGISStore(CONFIG.LAYER_URL); try { await st.init(); } catch(e) { if (e.auth) throw e; throw new Error("The dashboard reads the main layer, which only HO reviewers can open. Ask the form administrator to add you to the COAR – HO reviewers group."); } recs = await st.findAll(); }
+    const seen = {}, out = [];
+    recs.forEach(a => { const k = a.country + "|" + a.assessment_year; if (!a.country || seen[k]) return; seen[k] = 1; out.push(a); });
+    DASH.data = out; DASH.loadedAt = Date.now();
+  } catch(e) { DASH.error = e; }
+}
+function demoDashData(){
+  const out = []; let seed = 7;
+  const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+  const years = ["2023","2024","2025","2026"];
+  DATA.countries.forEach((c, ci) => {
+    const base = 1.75 + rnd() * 0.75, slope = (rnd() - 0.35) * 0.28;
+    years.forEach((y, yi) => {
+      if (yi === 3 && ci % 5 === 4) return;                       // not started yet
+      const partial = yi === 3 && ci % 4 === 1;                    // in progress
+      const a = {country:c.v, assessment_year:y, submission_status: partial ? "draft" : "submitted"};
+      SECTIONS.forEach((s, si) => {
+        if (partial && si > 7) return;
+        const adj = (rnd() - 0.5) * 0.7;
+        bySec(s.code).forEach(it => {
+          const v = base + slope * yi + adj + (rnd() - 0.5) * 1.3;
+          a[it.id] = rnd() < 0.04 ? "na" : v < 1.65 ? "1" : v < 2.45 ? "2" : "3";
+          if (a[it.id] === "1" && rnd() < 0.5) a[it.id + "_comment"] = "Not yet in place; plan agreed with HO";
+        });
+      });
+      if (!partial) { a.submitted_by = "Country Director"; a.submitted_at = Date.UTC(Number(y), 0, 20 + ci % 8); }
+      out.push(a);
+    });
+  });
+  const db = LS.get("coar-demo-db");                               // records entered in this browser override the examples
+  if (db && db.records) db.records.forEach(r => { const i = out.findIndex(a => a.country === r.attrs.country && String(a.assessment_year) === String(r.attrs.assessment_year)); if (i >= 0) out[i] = r.attrs; else out.push(r.attrs); });
+  return out;
+}
+const recFor = (c, y) => (DASH.data || []).find(a => a.country === c && String(a.assessment_year) === String(y));
+const statusOf = a => !a ? "Not started" : a.submission_status === "submitted" ? "Submitted" : "In progress";
+const yearsAvail = () => [...new Set([...(DASH.data || []).map(a => String(a.assessment_year)), ...DATA.years])].sort();
+
+/* ---- chart helpers (SVG) ---- */
+function donut(segs, total, size, stroke, center, sub){
+  const r = (size - stroke) / 2, C = 2 * Math.PI * r; let off = 0;
+  const arcs = segs.filter(s => s.v > 0).map(s => { const len = s.v / total * C, gap = len > 4 ? 2 : 0;
+    const el = `<circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" style="stroke:var(--${s.c})" stroke-width="${stroke}" stroke-dasharray="${Math.max(len - gap, 0.5)} ${C}" stroke-dashoffset="${-off}" data-tip="${esc(s.tip)}"/>`; off += len; return el; }).join("");
+  return `<svg class="donut" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="${esc(segs.map(s => s.tip).join("; "))}">
+    <g transform="rotate(-90 ${size/2} ${size/2})"><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" style="stroke:var(--empty)" stroke-width="${stroke}"/>${arcs}</g>
+    <text x="50%" y="${sub ? "47%" : "50%"}" text-anchor="middle" dominant-baseline="central" class="dn-c" style="font-size:${size/4.4}px">${center}</text>
+    ${sub ? `<text x="50%" y="66%" text-anchor="middle" dominant-baseline="central" class="dn-s" style="font-size:${size/11}px">${sub}</text>` : ""}</svg>`;
+}
+function segsOf(st, label){
+  const ans = st.r + st.am + st.g + st.na;
+  return [{v:st.r, c:"red", tip:`${label}: ${st.r} not in compliance (${pct(st.r, ans)}% of answered)`},
+          {v:st.am, c:"amber", tip:`${label}: ${st.am} partially (${pct(st.am, ans)}%)`},
+          {v:st.g, c:"green", tip:`${label}: ${st.g} fully in compliance (${pct(st.g, ans)}%)`},
+          {v:st.na, c:"na", tip:`${label}: ${st.na} not applicable (${pct(st.na, ans)}%)`}];
+}
+function lineChart(points){ // points: [{x:"2023", y:2.1}]
+  const W = 640, H = 260, L = 44, R = 24, T = 16, B = 34, ymin = 1, ymax = 3;
+  const xs = i => points.length === 1 ? (L + W - R) / 2 : L + i * (W - L - R) / (points.length - 1);
+  const ys = v => T + (ymax - v) / (ymax - ymin) * (H - T - B);
+  const band = (a, b, c) => `<rect x="${L}" y="${ys(b)}" width="${W - L - R}" height="${ys(a) - ys(b)}" style="fill:var(--${c}-soft)" opacity=".55"/>`;
+  const valid = points.map((p, i) => ({...p, i})).filter(p => p.y != null);
+  const path = valid.map((p, k) => `${k ? "L" : "M"}${xs(p.i).toFixed(1)},${ys(p.y).toFixed(1)}`).join(" ");
+  return `<svg viewBox="0 0 ${W} ${H}" class="lc" role="img" aria-label="Overall average score by year">
+    ${band(1, 1.75, "red")}${band(1.75, 2.5, "amber")}${band(2.5, 3, "green")}
+    ${[1, 1.5, 2, 2.5, 3].map(v => `<line x1="${L}" x2="${W - R}" y1="${ys(v)}" y2="${ys(v)}" class="grid"/><text x="${L - 8}" y="${ys(v)}" text-anchor="end" dominant-baseline="central" class="ax">${v.toFixed(1)}</text>`).join("")}
+    ${points.map((p, i) => `<text x="${xs(i)}" y="${H - 10}" text-anchor="middle" class="ax">${p.x}</text>`).join("")}
+    <path d="${path}" fill="none" style="stroke:var(--fg)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${valid.map((p, k) => `<circle cx="${xs(p.i)}" cy="${ys(p.y)}" r="6" style="fill:var(--${({g:"green",a:"amber",r:"red"})[ragClass(p.y)]});stroke:var(--surface)" stroke-width="2" data-tip="${p.x}: overall average ${p.y.toFixed(2)} (${rag(p.y)})"/>${k === valid.length - 1 ? `<text x="${xs(p.i)}" y="${ys(p.y) - 14}" text-anchor="middle" class="lbl">${p.y.toFixed(2)}</text>` : ""}`).join("")}
+  </svg>`;
+}
+function stackCols(rows){ // rows: [{x, st}]
+  const W = 640, H = 220, L = 44, R = 24, T = 12, B = 34, n = rows.length, slot = (W - L - R) / Math.max(n, 1), bw = Math.min(56, slot * .5);
+  const y = p => T + (1 - p) * (H - T - B);
+  let out = [0, .25, .5, .75, 1].map(p => `<line x1="${L}" x2="${W - R}" y1="${y(p)}" y2="${y(p)}" class="grid"/><text x="${L - 8}" y="${y(p)}" text-anchor="end" dominant-baseline="central" class="ax">${p * 100}%</text>`).join("");
+  rows.forEach((row, i) => { const st = row.st, ans = st.r + st.am + st.g + st.na, cx = L + slot * i + slot / 2; let acc = 0;
+    out += `<text x="${cx}" y="${H - 10}" text-anchor="middle" class="ax">${row.x}</text>`;
+    if (!ans) return;
+    [["r","red","not in compliance"],["am","amber","partially"],["g","green","fully"],["na","na","N/A"]].forEach(([k, c, lab]) => { const v = st[k] / ans; if (!v) return;
+      const y1 = y(acc + v), h = y(acc) - y1; out += `<rect x="${cx - bw/2}" y="${y1 + 1}" width="${bw}" height="${Math.max(h - 2, 0.5)}" style="fill:var(--${c})" data-tip="${row.x}: ${st[k]} ${lab} (${Math.round(v * 100)}%)"/>`; acc += v; }); });
+  return `<svg viewBox="0 0 ${W} ${H}" class="lc" role="img" aria-label="Share of scores by year">${out}</svg>`;
+}
+const legend = () => `<div class="legend"><span><i class="dot" style="background:var(--red)"></i>1 · Not in compliance</span><span><i class="dot" style="background:var(--amber)"></i>2 · Partially</span><span><i class="dot" style="background:var(--green)"></i>3 · Fully</span><span><i class="dot" style="background:var(--na)"></i>N/A</span><span><i class="dot" style="background:var(--empty);outline:1px solid var(--line)"></i>Not answered</span></div>`;
+
+/* ---- views ---- */
+function renderDash(){
+  const root = $app();
+  if (!DASH.data && !DASH.error) { root.innerHTML = `<div class="card"><h1>Loading dashboard…</h1><p>Reading all country office assessments.</p></div>`; loadDash().then(renderDash); return; }
+  if (DASH.error) { if (DASH.error.auth) { renderSignIn(DASH.error.message, true); return; } root.innerHTML = `<div class="card"><div class="eyebrow">HO dashboard</div><h1>The dashboard could not load</h1><p class="note err">${esc(DASH.error.message)}</p><div><button class="btn" id="d-retry">Try again</button></div></div>`; document.getElementById("d-retry").onclick = () => { DASH.error = null; DASH.data = null; renderDash(); }; return; }
+  if (!DASH.country) DASH.country = (APP.country && DATA.countries.some(c => c.v === APP.country)) ? APP.country : DATA.countries[0].v;
+  const years = yearsAvail();
+  const body = DASH.mode === "overview" ? viewOverview() : DASH.mode === "country" ? viewCountry() : viewTrend();
+  root.innerHTML = `
+    <div class="dash-head"><div><div class="eyebrow">HO dashboard${DEMO ? " · example data" : ""}</div><h1>${DASH.mode === "overview" ? "All country offices" : DASH.mode === "country" ? "Country office profile" : "Progress over time"}</h1></div>
+      <span class="muted" style="font-size:.8rem">Data loaded ${DASH.loadedAt ? new Date(DASH.loadedAt).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) : ""} · <button class="linkbtn" id="d-refresh" style="color:var(--accent)">Refresh</button></span></div>
+    <div class="filters">
+      <div class="seg" role="group" aria-label="View">${[["overview","All offices"],["country","Country profile"],["trend","Trends"]].map(([k, l]) => `<button data-mode="${k}" aria-pressed="${DASH.mode === k}">${l}</button>`).join("")}</div>
+      ${DASH.mode !== "overview" ? `<div class="fld"><label for="d-country">Country office</label><select id="d-country">${DATA.countries.map(c => `<option value="${c.v}" ${c.v === DASH.country ? "selected" : ""}>${esc(c.l)}</option>`).join("")}</select></div>` : ""}
+      ${DASH.mode !== "trend" ? `<div class="fld"><label for="d-year">Year</label><select id="d-year">${years.map(y => `<option ${y === String(DASH.year) ? "selected" : ""}>${y}</option>`).join("")}</select></div>` : ""}
+    </div>
+    ${body}`;
+  root.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { DASH.mode = b.dataset.mode; renderDash(); });
+  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.onchange = fn; };
+  on("d-country", e => { DASH.country = e.target.value; renderDash(); });
+  on("d-year", e => { DASH.year = e.target.value; renderDash(); });
+  document.getElementById("d-refresh").onclick = async () => { DASH.data = null; renderDash(); };
+  root.querySelectorAll("tr[data-c]").forEach(tr => tr.onclick = () => { DASH.country = tr.dataset.c; DASH.mode = "country"; renderDash(); window.scrollTo({top:0}); });
+}
+
+function viewOverview(){
+  const y = String(DASH.year);
+  const rows = DATA.countries.map(c => { const a = recFor(c.v, y); const t = a ? calcTotals(a) : null; return {c, a, st: statusOf(a), ov: t ? t.overall_avg : null, t}; });
+  const sub = rows.filter(r => r.st === "Submitted"), prog = rows.filter(r => r.st === "In progress");
+  let s = 0, n = 0, reds = 0; sub.forEach(r => { const t = r.t; s += t.total_red + t.total_amber * 2 + t.total_green * 3; n += t.total_red + t.total_amber + t.total_green; reds += t.total_red; });
+  const avg = n ? s / n : null;
+  rows.sort((a, b) => (a.ov ?? 9) - (b.ov ?? 9));
+  return `<div class="kpis">
+      <div class="kpi"><span class="l">Submitted to HO</span><span class="v">${sub.length}<small> / ${DATA.countries.length}</small></span><span class="s">${prog.length} in progress · ${DATA.countries.length - sub.length - prog.length} not started</span></div>
+      <div class="kpi"><span class="l">Average score, submitted offices</span><span class="v">${avg != null ? avg.toFixed(2) : "–"}</span><span class="s">${avg != null ? `<span class="pill ${ragClass(avg)}">${rag(avg)}</span>` : "no submissions yet"}</span></div>
+      <div class="kpi"><span class="l">Requirements not in compliance</span><span class="v">${reds}</span><span class="s">scored 1 across submitted offices</span></div>
+      <div class="kpi"><span class="l">Offices with a red overall score</span><span class="v">${sub.filter(r => rag(r.ov) === "Red").length}</span><span class="s">average below 1.75</span></div>
+    </div>
+    <div class="panel"><div class="panel-head"><div><h2>Average score by section, ${esc(y)}</h2><p class="sub">Lowest overall first. Select a country to open its profile. Green ≥ 2.5 · Amber 1.75–2.49 · Red &lt; 1.75.</p></div></div>
+    <div class="hm-scroll"><table class="hm"><thead><tr><th class="cn">Country office</th><th>Overall</th>${SECTIONS.map(s => `<th title="${esc(secName(s))}">${s.num}<span class="full">${esc(s.name.replace(" management","").replace("Staff and Management Support","Staff & Mgmt"))}</span></th>`).join("")}</tr></thead>
+    <tbody>${rows.map(r => `<tr data-c="${r.c.v}"><td class="cname">${esc(r.c.l)}${r.st !== "Submitted" ? `<span class="st">${r.st.toLowerCase()}</span>` : ""}</td>
+      <td class="c-${ragClass(r.ov)} ov" data-tip="${esc(r.c.l)}: overall ${r.ov != null ? r.ov.toFixed(2) : "no data"}">${r.ov != null ? r.ov.toFixed(1) : "–"}</td>
+      ${SECTIONS.map(s => { const st = r.a ? calcSection(r.a, s.code) : null, v = st ? st[s.code + "_avg"] : null; return `<td class="c-${ragClass(v)}" data-tip="${esc(r.c.l)} · ${esc(secName(s))}: ${v != null ? v.toFixed(2) + ` (${st[s.code+"_red"]} red, ${st[s.code+"_amber"]} amber, ${st[s.code+"_green"]} green)` : "not answered"}">${v != null ? v.toFixed(1) : "–"}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+}
+
+function viewCountry(){
+  const y = String(DASH.year), c = DASH.country, lab = lbl(DATA.countries, c), a = recFor(c, y);
+  if (!a) return `<div class="panel"><h2>${esc(lab)} has not started its ${esc(y)} assessment</h2><p class="sub">Nothing to show yet. Choose another year to see earlier results.</p></div>`;
+  const t = calcTotals(a), prev = recFor(c, String(Number(y) - 1)), pt = prev ? calcTotals(prev) : null;
+  const answered = t.total_done, n = ITEMS.length, ov = t.overall_avg;
+  const delta = (ov != null && pt && pt.overall_avg != null) ? ov - pt.overall_avg : null;
+  const reds = ITEMS.filter(it => a[it.id] === "1"), ambers = ITEMS.filter(it => a[it.id] === "2");
+  const overallSt = {r:t.total_red, am:t.total_amber, g:t.total_green, na:t.total_na};
+  return `<div class="kpis">
+      <div class="kpi"><span class="l">Overall average</span><span class="v">${ov != null ? ov.toFixed(2) : "–"}</span><span class="s">${ov != null ? `<span class="pill ${ragClass(ov)}">${rag(ov)}</span>` : ""} ${delta != null ? `<span class="delta ${delta > 0.04 ? "up" : delta < -0.04 ? "down" : ""}">${delta > 0.04 ? "▲" : delta < -0.04 ? "▼" : "■"} ${delta >= 0 ? "+" : ""}${delta.toFixed(2)} vs ${Number(y) - 1}</span>` : ""}</span></div>
+      <div class="kpi"><span class="l">Status</span><span class="v" style="font-size:1.2rem">${statusOf(a)}</span><span class="s">${a.submitted_by ? `by ${esc(a.submitted_by)}${a.submitted_at ? ", " + new Date(a.submitted_at).toLocaleDateString() : ""}` : "not yet submitted"}</span></div>
+      <div class="kpi"><span class="l">Requirements answered</span><span class="v">${answered}<small> / ${n}</small></span><span class="s">${pct(answered, n)}% complete</span></div>
+      <div class="kpi"><span class="l">Not in compliance</span><span class="v">${t.total_red}</span><span class="s">${t.total_amber} partially · ${t.total_green} fully · ${t.total_na} N/A</span></div>
+    </div>
+    <div class="two">
+      <div class="panel"><h2>All requirements</h2><p class="sub">Share of the ${n} requirements by score.</p>
+        <div class="dn-big">${donut(segsOf(overallSt, "All sections"), n, 200, 30, ov != null ? ov.toFixed(1) : "–", "average")}
+          <table class="dn-tab"><tbody>${[["red","1 · Not in compliance",t.total_red],["amber","2 · Partially",t.total_amber],["green","3 · Fully",t.total_green],["na","N/A",t.total_na],["empty","Not answered",n - answered]].map(([cc, l, v]) => `<tr><td><i class="dot" style="background:var(--${cc})${cc === "empty" ? ";outline:1px solid var(--line)" : ""}"></i>${l}</td><td class="num">${v}</td><td class="num muted">${pct(v, n)}%</td></tr>`).join("")}</tbody></table></div></div>
+      <div class="panel"><h2>Needs attention</h2><p class="sub">${reds.length} requirement${reds.length === 1 ? "" : "s"} scored 1 · Not in compliance${ambers.length ? `, ${ambers.length} scored 2` : ""}.</p>
+        <ul class="att">${reds.slice(0, 40).map(it => `<li><span class="mono q-id">${it.id.replace("_","-")}</span><div><div>${esc(it.q)}</div>${a[it.id + "_comment"] ? `<div class="hint">“${esc(a[it.id + "_comment"])}”</div>` : ""}</div></li>`).join("") || `<li class="muted">No requirements scored 1.</li>`}</ul></div>
+    </div>
+    <div class="panel" style="margin-top:16px"><div class="panel-head"><div><h2>Scores by section</h2><p class="sub">Each ring shows the share of the section's requirements by score; the number is the section average.</p></div>${legend()}</div>
+      <div class="sec-grid">${SECTIONS.map(s => { const st = calcSection(a, s.code), m = bySec(s.code).length, v = st[s.code+"_avg"], ps = prev ? calcSection(prev, s.code)[s.code+"_avg"] : null, d = (v != null && ps != null) ? v - ps : null;
+        return `<div class="sec-card">${donut(segsOf({r:st[s.code+"_red"], am:st[s.code+"_amber"], g:st[s.code+"_green"], na:st[s.code+"_na"]}, secName(s)), m, 92, 14, v != null ? v.toFixed(1) : "–")}
+          <div class="sc-t"><b>${esc(secName(s))}</b><span>${st[s.code+"_red"]} red · ${st[s.code+"_amber"]} amber · ${st[s.code+"_green"]} green${st[s.code+"_na"] ? ` · ${st[s.code+"_na"]} N/A` : ""}</span><span class="muted">${st[s.code+"_done"]}/${m} answered${d != null ? ` · <span class="delta ${d > 0.04 ? "up" : d < -0.04 ? "down" : ""}">${d > 0.04 ? "▲" : d < -0.04 ? "▼" : "■"} ${d >= 0 ? "+" : ""}${d.toFixed(1)}</span>` : ""}</span></div></div>`; }).join("")}</div></div>`;
+}
+
+function viewTrend(){
+  const c = DASH.country, lab = lbl(DATA.countries, c);
+  const recs = (DASH.data || []).filter(a => a.country === c).sort((x, y) => Number(x.assessment_year) - Number(y.assessment_year));
+  if (!recs.length) return `<div class="panel"><h2>No assessments yet for ${esc(lab)}</h2></div>`;
+  const pts = recs.map(a => ({x:String(a.assessment_year), y:calcTotals(a).overall_avg, a}));
+  const valid = pts.filter(p => p.y != null);
+  let headline = "Only one year of results so far; the trend appears from the second year.";
+  if (valid.length >= 2) { const f = valid[0], l = valid[valid.length - 1], d = l.y - f.y;
+    headline = `<b>${d > 0.1 ? "Improving" : d < -0.1 ? "Declining" : "Stable"}:</b> overall average ${f.y.toFixed(2)} in ${f.x} → ${l.y.toFixed(2)} in ${l.x} (${d >= 0 ? "+" : ""}${d.toFixed(2)}).`; }
+  const last2 = valid.slice(-2);
+  const secRows = SECTIONS.map(s => { const vals = pts.map(p => calcSection(p.a, s.code)[s.code+"_avg"]);
+    const a1 = last2.length === 2 ? calcSection(last2[0].a, s.code)[s.code+"_avg"] : null, a2 = last2.length === 2 ? calcSection(last2[1].a, s.code)[s.code+"_avg"] : null, d = (a1 != null && a2 != null) ? a2 - a1 : null;
+    return {s, vals, d}; });
+  const up = secRows.filter(r => r.d != null && r.d > 0.04).length, down = secRows.filter(r => r.d != null && r.d < -0.04).length;
+  return `<p class="note">${headline}${last2.length === 2 ? ` Since ${last2[0].x}: ${up} section${up === 1 ? "" : "s"} improved, ${down} declined.` : ""}</p>
+    <div class="two">
+      <div class="panel"><h2>Overall average score</h2><p class="sub">${esc(lab)}, by year. Background bands: green ≥ 2.5, amber 1.75–2.49, red &lt; 1.75.</p>${lineChart(pts)}</div>
+      <div class="panel"><div class="panel-head"><div><h2>Share of scores</h2><p class="sub">Answered requirements by score, each year.</p></div></div>${stackCols(pts.map(p => ({x:p.x, st:{r:calcTotals(p.a).total_red, am:calcTotals(p.a).total_amber, g:calcTotals(p.a).total_green, na:calcTotals(p.a).total_na}})))}${legend()}</div>
+    </div>
+    <div class="panel" style="margin-top:16px"><h2>Section averages by year</h2><p class="sub">The last column compares the two most recent years.</p>
+      <div class="hm-scroll"><table class="hm tr"><thead><tr><th class="cn">Section</th>${pts.map(p => `<th>${p.x}</th>`).join("")}<th>Change</th></tr></thead>
+      <tbody>${secRows.map(r => `<tr><td class="cname">${esc(secName(r.s))}</td>${r.vals.map((v, i) => `<td class="c-${ragClass(v)}" data-tip="${esc(secName(r.s))}, ${pts[i].x}: ${v != null ? v.toFixed(2) : "not answered"}">${v != null ? v.toFixed(1) : "–"}</td>`).join("")}<td class="chg">${r.d == null ? "–" : `<span class="delta ${r.d > 0.04 ? "up" : r.d < -0.04 ? "down" : ""}">${r.d > 0.04 ? "▲" : r.d < -0.04 ? "▼" : "■"} ${r.d >= 0 ? "+" : ""}${r.d.toFixed(1)}</span>`}</td></tr>`).join("")}</tbody></table></div></div>`;
+}
+
+/* ---- tooltip ---- */
+document.addEventListener("mousemove", e => { const t = document.getElementById("tip"), el = e.target.closest && e.target.closest("[data-tip]");
+  if (!el) { t.hidden = true; return; } t.textContent = el.getAttribute("data-tip"); t.hidden = false;
+  const x = Math.min(e.clientX + 14, window.innerWidth - t.offsetWidth - 8), y = e.clientY + 16 + t.offsetHeight > window.innerHeight ? e.clientY - t.offsetHeight - 10 : e.clientY + 16;
+  t.style.left = x + "px"; t.style.top = y + "px"; });
+
+/* ---- switching between form and dashboard ---- */
+function setTabs(){ document.getElementById("tab-form").setAttribute("aria-selected", APP.view !== "dash"); document.getElementById("tab-dash").setAttribute("aria-selected", APP.view === "dash"); document.getElementById("savest").style.visibility = APP.view === "dash" ? "hidden" : ""; }
+function showMain(){ setTabs(); if (APP.view === "dash") renderDash(); else if (APP.oid) renderForm(); else renderStart(); window.scrollTo({top:0}); }
+async function switchView(v){ APP.view = v; LS.set("coar-view", v); history.replaceState(null, "", location.pathname + (v === "dash" ? "#dashboard" : "")); setTabs(); if (!APP.user) return; if (APP.oid) await flush(); showMain(); }
+
 /* ================= BOOT ================= */
+APP.view = location.hash === "#dashboard" ? "dash" : (LS.get("coar-view") || "form");
+document.getElementById("tab-form").onclick = () => switchView("form");
+document.getElementById("tab-dash").onclick = () => switchView("dash");
+setTabs();
 async function boot(){
   if (window.COAR_EXPECT_CONFIG && !window.COAR_CONFIG) {
     $app().innerHTML = `<div class="card"><div><div class="eyebrow">Setup problem</div><h1>The settings file could not be read</h1></div>
@@ -602,7 +880,7 @@ async function boot(){
     document.getElementById("demo-chip").hidden = false;
     APP.user = {name:"Demo user", email:"", username:"demo"};
     document.getElementById("who").textContent = "Demo user";
-    renderStart(); return;
+    showMain(); return;
   }
   const q = new URLSearchParams(location.search);
   if (q.get("code") || q.get("error")) {
@@ -624,7 +902,8 @@ async function afterSignIn(){
   } catch(e) { renderSignIn(e.message); return; }
   document.getElementById("who").innerHTML = `${esc(APP.user.name)} · <button class="linkbtn" id="signout">Sign out</button>`;
   document.getElementById("signout").onclick = async () => { await flush(); Auth.signOut(); };
-  if (APP.oid) { flush(); renderForm(); } else renderStart();
+  if (APP.oid) flush();
+  showMain();
 }
 window.addEventListener("message", async e => {
   if (e.origin !== location.origin || !e.data || e.data.type !== "coar-auth") return;
