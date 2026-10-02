@@ -232,7 +232,7 @@ table.hm:not(.tr){min-width:940px}
 <header class="top">
   <div class="top-in">
     <div class="brand"><b>Country Office Annual Requirements</b><span id="brand-sub">Annual self-assessment</span></div>
-    <nav class="vtabs" role="tablist"><button role="tab" id="tab-form" aria-selected="true">Requirements Checklist</button><button role="tab" id="tab-dash" aria-selected="false">HO dashboard</button></nav>
+    <nav class="vtabs" role="tablist"><button role="tab" id="tab-form" aria-selected="true">Requirements Checklist</button><button role="tab" id="tab-dash" aria-selected="false">Dashboards</button></nav>
     <span class="savest" id="savest" data-s="saved" hidden><i></i><span id="savest-t">All changes saved</span></span>
     <span class="who" id="who"></span>
     <span class="demo-chip" id="demo-chip" hidden>Demo mode</span>
@@ -359,7 +359,9 @@ class ArcGISStore {
   async find(country, year){
     const where = `${this.f("country")}='${country.replace(/'/g,"''")}' AND ${this.f("assessment_year")}='${String(year).replace(/'/g,"''")}'`;
     const r = await agsPost(this.url + "/query", {where, outFields:"*", orderByFields:this.oid + " ASC", returnGeometry:"false"});
-    const ft = r.features && r.features[0];
+    const fs = r.features || [], st = this.f("submission_status");
+    const filled = f => ITEMS.filter(it => { const k = this.f(it.id); return k && f.attributes[k] != null && f.attributes[k] !== ""; }).length;
+    const ft = fs.slice().sort((x, y) => (y.attributes[st] === "submitted") - (x.attributes[st] === "submitted") || filled(y) - filled(x) || x.attributes[this.oid] - y.attributes[this.oid])[0];
     return ft ? {oid: ft.attributes[this.oid], attrs: this.fromLayer(ft.attributes)} : null;
   }
   async create(attrs){
@@ -619,7 +621,7 @@ function renderReview(){
   const jump = list => list.slice(0, 12).map(it => `<button class="jump" data-goitem="${it.code}">${it.id.replace("_","-")}</button>`).join(", ") + (list.length > 12 ? ` and ${list.length - 12} more` : "");
   const ov = a.overall_avg, rc = {Green:"g", Amber:"a", Red:"r"}[rag(ov)] || "n";
   return `<div class="sec-head"><div><div class="eyebrow">${ro ? "Submitted assessment" : "Final step"}</div><h2>${ro ? "Summary" : "Review and submit"}</h2></div>
-    <span class="pill ${rc}">Overall ${ov != null ? Number(ov).toFixed(1) : "–"}${rag(ov) ? " · " + rag(ov) : ""}</span></div>
+    <span class="pill ${rc}">Overall compliance ${fp(ov != null ? Number(ov) : null)}${rag(ov) ? " · " + rag(ov) : ""}</span></div>
     ${!ro && unanswered.length ? `<p class="note warn">${unanswered.length} ${unanswered.length===1?"requirement is":"requirements are"} not answered yet: ${jump(unanswered)}</p>` : ""}
     <div class="review">${SECTIONS.map((s, i) => { const p = secProgress(a, s.code);
       return `<div class="rv-row"><div><b>${esc(secName(s))}</b><div class="edited">${p.done}/${p.n} answered${a[s.code+"_edited_by"] ? ` · ${esc(a[s.code+"_edited_by"])}, ${fmtDate(a[s.code+"_edited_at"])}` : ""}</div></div>
@@ -669,6 +671,12 @@ const DASH = {mode:"overview", year:CONFIG.DEFAULT_YEAR, country:null, data:null
 const SEC_COLOR = {r:"red", am:"amber", g:"green", na:"na"};
 const pct = (n, d) => d ? Math.round(n / d * 100) : 0;
 const ragClass = v => ({Green:"g", Amber:"a", Red:"r"})[rag(v)] || "x";
+// Compliance %: fully = 100%, partially = 50%, not in compliance = 0%, N/A left out. Same as (average score - 1) / 2.
+const cp = avg => avg == null ? null : (avg - 1) / 2 * 100;
+const fp = avg => avg == null ? "–" : Math.round(cp(avg)) + "%";
+const fpp = d => (d >= 0 ? "+" : "−") + Math.abs(Math.round(d * 50)) + " pts";   // change in average -> percentage points
+const dArrow = d => `<span class="delta ${d > 0.04 ? "up" : d < -0.04 ? "down" : ""}">${d > 0.04 ? "▲" : d < -0.04 ? "▼" : "■"} ${fpp(d)}</span>`;
+const THRESH = "Green 75% and above · Amber 38–74% · Red below 38%";
 
 async function loadDash(force){
   if (DASH.data && !force) return;
@@ -677,9 +685,14 @@ async function loadDash(force){
     let recs;
     if (DEMO) recs = demoDashData();
     else { const st = new ArcGISStore(CONFIG.LAYER_URL); try { await st.init(); } catch(e) { if (e.auth) throw e; throw new Error("The dashboard reads the main layer, which only HO reviewers can open. Ask the form administrator to add you to the COAR – HO reviewers group."); } recs = await st.findAll(); }
-    const seen = {}, out = [];
-    recs.forEach(a => { const k = a.country + "|" + a.assessment_year; if (!a.country || seen[k]) return; seen[k] = 1; out.push(a); });
-    DASH.data = out; DASH.loadedAt = Date.now();
+    // One record per country and year. If there are several, use the submitted one (or the one with most answers) and report the duplicates.
+    const groups = {};
+    recs.forEach(a => { if (!a.country) return; const k = a.country + "|" + a.assessment_year; (groups[k] = groups[k] || []).push(a); });
+    const answeredN = a => ITEMS.filter(it => a[it.id] != null && a[it.id] !== "").length;
+    DASH.dups = []; DASH.total = recs.length;
+    DASH.data = Object.values(groups).map(g => { if (g.length > 1) DASH.dups.push({country:g[0].country, year:g[0].assessment_year, n:g.length});
+      return g.slice().sort((x, y) => (y.submission_status === "submitted") - (x.submission_status === "submitted") || answeredN(y) - answeredN(x))[0]; });
+    DASH.loadedAt = Date.now();
   } catch(e) { DASH.error = e; }
 }
 function demoDashData(){
@@ -737,12 +750,12 @@ function lineChart(points){ // points: [{x:"2023", y:2.1}]
   const band = (a, b, c) => `<rect x="${L}" y="${ys(b)}" width="${W - L - R}" height="${ys(a) - ys(b)}" style="fill:var(--${c}-soft)" opacity=".55"/>`;
   const valid = points.map((p, i) => ({...p, i})).filter(p => p.y != null);
   const path = valid.map((p, k) => `${k ? "L" : "M"}${xs(p.i).toFixed(1)},${ys(p.y).toFixed(1)}`).join(" ");
-  return `<svg viewBox="0 0 ${W} ${H}" class="lc" role="img" aria-label="Overall average score by year">
+  return `<svg viewBox="0 0 ${W} ${H}" class="lc" role="img" aria-label="Overall compliance by year">
     ${band(1, 1.75, "red")}${band(1.75, 2.5, "amber")}${band(2.5, 3, "green")}
-    ${[1, 1.5, 2, 2.5, 3].map(v => `<line x1="${L}" x2="${W - R}" y1="${ys(v)}" y2="${ys(v)}" class="grid"/><text x="${L - 8}" y="${ys(v)}" text-anchor="end" dominant-baseline="central" class="ax">${v.toFixed(1)}</text>`).join("")}
+    ${[1, 1.5, 2, 2.5, 3].map(v => `<line x1="${L}" x2="${W - R}" y1="${ys(v)}" y2="${ys(v)}" class="grid"/><text x="${L - 8}" y="${ys(v)}" text-anchor="end" dominant-baseline="central" class="ax">${fp(v)}</text>`).join("")}
     ${points.map((p, i) => `<text x="${xs(i)}" y="${H - 10}" text-anchor="middle" class="ax">${p.x}</text>`).join("")}
     <path d="${path}" fill="none" style="stroke:var(--fg)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    ${valid.map((p, k) => `<circle cx="${xs(p.i)}" cy="${ys(p.y)}" r="6" style="fill:var(--${({g:"green",a:"amber",r:"red"})[ragClass(p.y)]});stroke:var(--surface)" stroke-width="2" data-tip="${p.x}: overall average ${p.y.toFixed(2)} (${rag(p.y)})"/>${k === valid.length - 1 ? `<text x="${xs(p.i)}" y="${ys(p.y) - 14}" text-anchor="middle" class="lbl">${p.y.toFixed(2)}</text>` : ""}`).join("")}
+    ${valid.map((p, k) => `<circle cx="${xs(p.i)}" cy="${ys(p.y)}" r="6" style="fill:var(--${({g:"green",a:"amber",r:"red"})[ragClass(p.y)]});stroke:var(--surface)" stroke-width="2" data-tip="${p.x}: overall compliance ${fp(p.y)} (${rag(p.y)})"/>${k === valid.length - 1 ? `<text x="${xs(p.i)}" y="${ys(p.y) - 14}" text-anchor="middle" class="lbl">${fp(p.y)}</text>` : ""}`).join("")}
   </svg>`;
 }
 function stackCols(rows){ // rows: [{x, st}]
@@ -762,19 +775,21 @@ const legend = () => `<div class="legend"><span><i class="dot" style="background
 function renderDash(){
   const root = $app();
   if (!DASH.data && !DASH.error) { root.innerHTML = `<div class="card"><h1>Loading dashboard…</h1><p>Reading all country office assessments.</p></div>`; loadDash().then(renderDash); return; }
-  if (DASH.error) { if (DASH.error.auth) { renderSignIn(DASH.error.message, true); return; } root.innerHTML = `<div class="card"><div class="eyebrow">HO dashboard</div><h1>The dashboard could not load</h1><p class="note err">${esc(DASH.error.message)}</p><div><button class="btn" id="d-retry">Try again</button></div></div>`; document.getElementById("d-retry").onclick = () => { DASH.error = null; DASH.data = null; renderDash(); }; return; }
+  if (DASH.error) { if (DASH.error.auth) { renderSignIn(DASH.error.message, true); return; } root.innerHTML = `<div class="card"><div class="eyebrow">Dashboards</div><h1>The dashboard could not load</h1><p class="note err">${esc(DASH.error.message)}</p><div><button class="btn" id="d-retry">Try again</button></div></div>`; document.getElementById("d-retry").onclick = () => { DASH.error = null; DASH.data = null; renderDash(); }; return; }
   if (!DASH.country) DASH.country = (APP.country && DATA.countries.some(c => c.v === APP.country)) ? APP.country : DATA.countries[0].v;
   const years = yearsAvail();
   const body = DASH.mode === "overview" ? viewOverview() : DASH.mode === "country" ? viewCountry() : viewTrend();
   root.innerHTML = `
-    <div class="dash-head"><div><div class="eyebrow">HO dashboard${DEMO ? " · example data" : ""}</div><h1>${DASH.mode === "overview" ? "All country offices" : DASH.mode === "country" ? "Country office profile" : "Progress over time"}</h1></div>
-      <span class="muted" style="font-size:.8rem">Data loaded ${DASH.loadedAt ? new Date(DASH.loadedAt).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) : ""} · <button class="linkbtn" id="d-refresh" style="color:var(--accent)">Refresh</button></span></div>
+    <div class="dash-head"><div><div class="eyebrow">Dashboards${DEMO ? " · example data" : ""}</div><h1>${DASH.mode === "overview" ? "All country offices" : DASH.mode === "country" ? "Country office profile" : "Progress over time"}</h1></div>
+      <span class="muted" style="font-size:.8rem">${DEMO ? "Example data, not connected to ArcGIS" : `${DASH.total} record${DASH.total === 1 ? "" : "s"} loaded from ArcGIS Online`} · ${DASH.loadedAt ? new Date(DASH.loadedAt).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) : ""} · <button class="linkbtn" id="d-refresh" style="color:var(--accent)">Refresh</button></span></div>
     <div class="filters">
       <div class="seg" role="group" aria-label="View">${[["overview","All offices"],["country","Country profile"],["trend","Trends"]].map(([k, l]) => `<button data-mode="${k}" aria-pressed="${DASH.mode === k}">${l}</button>`).join("")}</div>
       ${DASH.mode !== "overview" ? `<div class="fld"><label for="d-country">Country office</label><select id="d-country">${DATA.countries.map(c => `<option value="${c.v}" ${c.v === DASH.country ? "selected" : ""}>${esc(c.l)}</option>`).join("")}</select></div>` : ""}
       ${DASH.mode !== "trend" ? `<div class="fld"><label for="d-year">Year</label><select id="d-year">${years.map(y => `<option ${y === String(DASH.year) ? "selected" : ""}>${y}</option>`).join("")}</select></div>` : ""}
     </div>
-    ${body}`;
+    ${DASH.dups && DASH.dups.length ? `<p class="note warn">Duplicate records found: ${DASH.dups.map(d => `${esc(lbl(DATA.countries, d.country))} ${esc(d.year)} (${d.n} records)`).join(", ")}. The dashboard uses the submitted one, or the most complete. Delete the extra records in ArcGIS Online (layer › Data tab) to keep things tidy.</p>` : ""}
+    ${body}
+    <p class="muted" style="font-size:.78rem;margin-top:16px">How compliance is calculated: each requirement scored 3 (fully) counts 100%, 2 (partially) 50% and 1 (not in compliance) 0%; N/A and unanswered requirements are left out. ${THRESH}.</p>`;
   root.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { DASH.mode = b.dataset.mode; renderDash(); });
   const on = (id, fn) => { const el = document.getElementById(id); if (el) el.onchange = fn; };
   on("d-country", e => { DASH.country = e.target.value; renderDash(); });
@@ -792,15 +807,15 @@ function viewOverview(){
   rows.sort((a, b) => (a.ov ?? 9) - (b.ov ?? 9));
   return `<div class="kpis">
       <div class="kpi"><span class="l">Submitted to HO</span><span class="v">${sub.length}<small> / ${DATA.countries.length}</small></span><span class="s">${prog.length} in progress · ${DATA.countries.length - sub.length - prog.length} not started</span></div>
-      <div class="kpi"><span class="l">Average score, submitted offices</span><span class="v">${avg != null ? avg.toFixed(2) : "–"}</span><span class="s">${avg != null ? `<span class="pill ${ragClass(avg)}">${rag(avg)}</span>` : "no submissions yet"}</span></div>
+      <div class="kpi"><span class="l">Average compliance, submitted offices</span><span class="v">${fp(avg)}</span><span class="s">${avg != null ? `<span class="pill ${ragClass(avg)}">${rag(avg)}</span>` : "no submissions yet"}</span></div>
       <div class="kpi"><span class="l">Requirements not in compliance</span><span class="v">${reds}</span><span class="s">scored 1 across submitted offices</span></div>
-      <div class="kpi"><span class="l">Offices with a red overall score</span><span class="v">${sub.filter(r => rag(r.ov) === "Red").length}</span><span class="s">average below 1.75</span></div>
+      <div class="kpi"><span class="l">Offices with a red overall score</span><span class="v">${sub.filter(r => rag(r.ov) === "Red").length}</span><span class="s">overall compliance below 38%</span></div>
     </div>
-    <div class="panel"><div class="panel-head"><div><h2>Average score by section, ${esc(y)}</h2><p class="sub">Lowest overall first. Select a country to open its profile. Green ≥ 2.5 · Amber 1.75–2.49 · Red &lt; 1.75.</p></div></div>
+    <div class="panel"><div class="panel-head"><div><h2>Compliance by section, ${esc(y)}</h2><p class="sub">Lowest overall first. Select a country to open its profile. ${THRESH}.</p></div></div>
     <div class="hm-scroll"><table class="hm"><thead><tr><th class="cn">Country office</th><th>Overall</th>${SECTIONS.map(s => `<th title="${esc(secName(s))}">${s.num}<span class="full">${esc(s.name.replace(" management","").replace("Staff and Management Support","Staff & Mgmt"))}</span></th>`).join("")}</tr></thead>
     <tbody>${rows.map(r => `<tr data-c="${r.c.v}"><td class="cname">${esc(r.c.l)}${r.st !== "Submitted" ? `<span class="st">${r.st.toLowerCase()}</span>` : ""}</td>
-      <td class="c-${ragClass(r.ov)} ov" data-tip="${esc(r.c.l)}: overall ${r.ov != null ? r.ov.toFixed(2) : "no data"}">${r.ov != null ? r.ov.toFixed(1) : "–"}</td>
-      ${SECTIONS.map(s => { const st = r.a ? calcSection(r.a, s.code) : null, v = st ? st[s.code + "_avg"] : null; return `<td class="c-${ragClass(v)}" data-tip="${esc(r.c.l)} · ${esc(secName(s))}: ${v != null ? v.toFixed(2) + ` (${st[s.code+"_red"]} red, ${st[s.code+"_amber"]} amber, ${st[s.code+"_green"]} green)` : "not answered"}">${v != null ? v.toFixed(1) : "–"}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+      <td class="c-${ragClass(r.ov)} ov" data-tip="${esc(r.c.l)}: overall compliance ${r.ov != null ? fp(r.ov) : "no data"}">${fp(r.ov)}</td>
+      ${SECTIONS.map(s => { const st = r.a ? calcSection(r.a, s.code) : null, v = st ? st[s.code + "_avg"] : null; return `<td class="c-${ragClass(v)}" data-tip="${esc(r.c.l)} · ${esc(secName(s))}: ${v != null ? fp(v) + ` compliance (${st[s.code+"_red"]} red, ${st[s.code+"_amber"]} amber, ${st[s.code+"_green"]} green)` : "not answered"}">${fp(v)}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div></div>`;
 }
 
 function viewCountry(){
@@ -812,22 +827,22 @@ function viewCountry(){
   const reds = ITEMS.filter(it => a[it.id] === "1"), ambers = ITEMS.filter(it => a[it.id] === "2");
   const overallSt = {r:t.total_red, am:t.total_amber, g:t.total_green, na:t.total_na};
   return `<div class="kpis">
-      <div class="kpi"><span class="l">Overall average</span><span class="v">${ov != null ? ov.toFixed(2) : "–"}</span><span class="s">${ov != null ? `<span class="pill ${ragClass(ov)}">${rag(ov)}</span>` : ""} ${delta != null ? `<span class="delta ${delta > 0.04 ? "up" : delta < -0.04 ? "down" : ""}">${delta > 0.04 ? "▲" : delta < -0.04 ? "▼" : "■"} ${delta >= 0 ? "+" : ""}${delta.toFixed(2)} vs ${Number(y) - 1}</span>` : ""}</span></div>
+      <div class="kpi"><span class="l">Overall compliance</span><span class="v">${fp(ov)}</span><span class="s">${ov != null ? `<span class="pill ${ragClass(ov)}">${rag(ov)}</span>` : ""} ${delta != null ? `${dArrow(delta)} <span class="delta">vs ${Number(y) - 1}</span>` : ""}</span></div>
       <div class="kpi"><span class="l">Status</span><span class="v" style="font-size:1.2rem">${statusOf(a)}</span><span class="s">${a.submitted_by ? `by ${esc(a.submitted_by)}${a.submitted_at ? ", " + new Date(a.submitted_at).toLocaleDateString() : ""}` : "not yet submitted"}</span></div>
       <div class="kpi"><span class="l">Requirements answered</span><span class="v">${answered}<small> / ${n}</small></span><span class="s">${pct(answered, n)}% complete</span></div>
       <div class="kpi"><span class="l">Not in compliance</span><span class="v">${t.total_red}</span><span class="s">${t.total_amber} partially · ${t.total_green} fully · ${t.total_na} N/A</span></div>
     </div>
     <div class="two">
       <div class="panel"><h2>All requirements</h2><p class="sub">Share of the ${n} requirements by score.</p>
-        <div class="dn-big">${donut(segsOf(overallSt, "All sections"), n, 200, 30, ov != null ? ov.toFixed(1) : "–", "average")}
+        <div class="dn-big">${donut(segsOf(overallSt, "All sections"), n, 200, 30, fp(ov), "compliance")}
           <table class="dn-tab"><tbody>${[["red","1 · Not in compliance",t.total_red],["amber","2 · Partially",t.total_amber],["green","3 · Fully",t.total_green],["na","N/A",t.total_na],["empty","Not answered",n - answered]].map(([cc, l, v]) => `<tr><td><i class="dot" style="background:var(--${cc})${cc === "empty" ? ";outline:1px solid var(--line)" : ""}"></i>${l}</td><td class="num">${v}</td><td class="num muted">${pct(v, n)}%</td></tr>`).join("")}</tbody></table></div></div>
       <div class="panel"><h2>Needs attention</h2><p class="sub">${reds.length} requirement${reds.length === 1 ? "" : "s"} scored 1 · Not in compliance${ambers.length ? `, ${ambers.length} scored 2` : ""}.</p>
         <ul class="att">${reds.slice(0, 40).map(it => `<li><span class="mono q-id">${it.id.replace("_","-")}</span><div><div>${esc(it.q)}</div>${a[it.id + "_comment"] ? `<div class="hint">“${esc(a[it.id + "_comment"])}”</div>` : ""}</div></li>`).join("") || `<li class="muted">No requirements scored 1.</li>`}</ul></div>
     </div>
-    <div class="panel" style="margin-top:16px"><div class="panel-head"><div><h2>Scores by section</h2><p class="sub">Each ring shows the share of the section's requirements by score; the number is the section average.</p></div>${legend()}</div>
+    <div class="panel" style="margin-top:16px"><div class="panel-head"><div><h2>Scores by section</h2><p class="sub">Each ring shows the share of the section's requirements by score; the percentage is the section's compliance.</p></div>${legend()}</div>
       <div class="sec-grid">${SECTIONS.map(s => { const st = calcSection(a, s.code), m = bySec(s.code).length, v = st[s.code+"_avg"], ps = prev ? calcSection(prev, s.code)[s.code+"_avg"] : null, d = (v != null && ps != null) ? v - ps : null;
-        return `<div class="sec-card">${donut(segsOf({r:st[s.code+"_red"], am:st[s.code+"_amber"], g:st[s.code+"_green"], na:st[s.code+"_na"]}, secName(s)), m, 92, 14, v != null ? v.toFixed(1) : "–")}
-          <div class="sc-t"><b>${esc(secName(s))}</b><span>${st[s.code+"_red"]} red · ${st[s.code+"_amber"]} amber · ${st[s.code+"_green"]} green${st[s.code+"_na"] ? ` · ${st[s.code+"_na"]} N/A` : ""}</span><span class="muted">${st[s.code+"_done"]}/${m} answered${d != null ? ` · <span class="delta ${d > 0.04 ? "up" : d < -0.04 ? "down" : ""}">${d > 0.04 ? "▲" : d < -0.04 ? "▼" : "■"} ${d >= 0 ? "+" : ""}${d.toFixed(1)}</span>` : ""}</span></div></div>`; }).join("")}</div></div>`;
+        return `<div class="sec-card">${donut(segsOf({r:st[s.code+"_red"], am:st[s.code+"_amber"], g:st[s.code+"_green"], na:st[s.code+"_na"]}, secName(s)), m, 92, 14, fp(v))}
+          <div class="sc-t"><b>${esc(secName(s))}</b><span>${st[s.code+"_red"]} red · ${st[s.code+"_amber"]} amber · ${st[s.code+"_green"]} green${st[s.code+"_na"] ? ` · ${st[s.code+"_na"]} N/A` : ""}</span><span class="muted">${st[s.code+"_done"]}/${m} answered${d != null ? ` · ${dArrow(d)}` : ""}</span></div></div>`; }).join("")}</div></div>`;
 }
 
 function viewTrend(){
@@ -838,7 +853,7 @@ function viewTrend(){
   const valid = pts.filter(p => p.y != null);
   let headline = "Only one year of results so far; the trend appears from the second year.";
   if (valid.length >= 2) { const f = valid[0], l = valid[valid.length - 1], d = l.y - f.y;
-    headline = `<b>${d > 0.1 ? "Improving" : d < -0.1 ? "Declining" : "Stable"}:</b> overall average ${f.y.toFixed(2)} in ${f.x} → ${l.y.toFixed(2)} in ${l.x} (${d >= 0 ? "+" : ""}${d.toFixed(2)}).`; }
+    headline = `<b>${d > 0.1 ? "Improving" : d < -0.1 ? "Declining" : "Stable"}:</b> overall compliance ${fp(f.y)} in ${f.x} → ${fp(l.y)} in ${l.x} (${fpp(d)}).`; }
   const last2 = valid.slice(-2);
   const secRows = SECTIONS.map(s => { const vals = pts.map(p => calcSection(p.a, s.code)[s.code+"_avg"]);
     const a1 = last2.length === 2 ? calcSection(last2[0].a, s.code)[s.code+"_avg"] : null, a2 = last2.length === 2 ? calcSection(last2[1].a, s.code)[s.code+"_avg"] : null, d = (a1 != null && a2 != null) ? a2 - a1 : null;
@@ -846,12 +861,12 @@ function viewTrend(){
   const up = secRows.filter(r => r.d != null && r.d > 0.04).length, down = secRows.filter(r => r.d != null && r.d < -0.04).length;
   return `<p class="note">${headline}${last2.length === 2 ? ` Since ${last2[0].x}: ${up} section${up === 1 ? "" : "s"} improved, ${down} declined.` : ""}</p>
     <div class="two">
-      <div class="panel"><h2>Overall average score</h2><p class="sub">${esc(lab)}, by year. Background bands: green ≥ 2.5, amber 1.75–2.49, red &lt; 1.75.</p>${lineChart(pts)}</div>
+      <div class="panel"><h2>Overall compliance</h2><p class="sub">${esc(lab)}, by year. Background bands: ${THRESH}.</p>${lineChart(pts)}</div>
       <div class="panel"><div class="panel-head"><div><h2>Share of scores</h2><p class="sub">Answered requirements by score, each year.</p></div></div>${stackCols(pts.map(p => ({x:p.x, st:{r:calcTotals(p.a).total_red, am:calcTotals(p.a).total_amber, g:calcTotals(p.a).total_green, na:calcTotals(p.a).total_na}})))}${legend()}</div>
     </div>
-    <div class="panel" style="margin-top:16px"><h2>Section averages by year</h2><p class="sub">The last column compares the two most recent years.</p>
+    <div class="panel" style="margin-top:16px"><h2>Section compliance by year</h2><p class="sub">The last column compares the two most recent years.</p>
       <div class="hm-scroll"><table class="hm tr"><thead><tr><th class="cn">Section</th>${pts.map(p => `<th>${p.x}</th>`).join("")}<th>Change</th></tr></thead>
-      <tbody>${secRows.map(r => `<tr><td class="cname">${esc(secName(r.s))}</td>${r.vals.map((v, i) => `<td class="c-${ragClass(v)}" data-tip="${esc(secName(r.s))}, ${pts[i].x}: ${v != null ? v.toFixed(2) : "not answered"}">${v != null ? v.toFixed(1) : "–"}</td>`).join("")}<td class="chg">${r.d == null ? "–" : `<span class="delta ${r.d > 0.04 ? "up" : r.d < -0.04 ? "down" : ""}">${r.d > 0.04 ? "▲" : r.d < -0.04 ? "▼" : "■"} ${r.d >= 0 ? "+" : ""}${r.d.toFixed(1)}</span>`}</td></tr>`).join("")}</tbody></table></div></div>`;
+      <tbody>${secRows.map(r => `<tr><td class="cname">${esc(secName(r.s))}</td>${r.vals.map((v, i) => `<td class="c-${ragClass(v)}" data-tip="${esc(secName(r.s))}, ${pts[i].x}: ${v != null ? fp(v) + " compliance" : "not answered"}">${fp(v)}</td>`).join("")}<td class="chg">${r.d == null ? "–" : dArrow(r.d)}</td></tr>`).join("")}</tbody></table></div></div>`;
 }
 
 /* ---- tooltip ---- */
