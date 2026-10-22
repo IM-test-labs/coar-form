@@ -12,12 +12,12 @@ window.COAR_CONFIG = {
   CLIENT_ID: "lvOneQgNzRxoGURs",
 
   // 3. Address of the main survey layer, ending in /FeatureServer/0 (Phase 2)
-  LAYER_URL: "https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/service_f50aeb0340a547b6935aae9ddeac652c/FeatureServer/0",
+  LAYER_URL: "https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/service_6885a23c735547f094c8c3c02dcea3e0/FeatureServer/0",
 
   // 4. Address of each country office's view, ending in /FeatureServer/0 (Phase 3)
   //    Leave a country empty ("") until its view exists.
   COUNTRY_LAYER_URLS: {
-    "afghanistan":             "",   // Afghanistan
+    "afghanistan":             "https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/COAR_-_Afghanistan/FeatureServer/0",   // Afghanistan
     "angola":                  "",   // Angola
     "bosnia_and_herzegovina":  "",   // Bosnia and Herzegovina
     "cambodia":                "",   // Cambodia
@@ -26,7 +26,7 @@ window.COAR_CONFIG = {
     "ethiopia":                "",   // Ethiopia
     "iraq":                    "",   // Iraq
     "kosovo":                  "",   // Kosovo
-    "lao_pdr":                 "https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/COAR_Lao_PDR/FeatureServer/0",   // Lao PDR
+    "lao_pdr":                 "https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/COAR_%E2%80%93_Lao_PDR/FeatureServer/0",   // Lao PDR
     "lebanon":                 "",   // Lebanon
     "mozambique":              "",   // Mozambique
     "myanmar":                 "",   // Myanmar
@@ -44,7 +44,7 @@ window.COAR_CONFIG = {
   },
 
   // 5. The assessment year the form shows first
-  DEFAULT_YEAR: "2026",
+  DEFAULT_YEAR: "2027",
 
   // 6. Roles allowed to submit to HQ (leave as it is)
   SUBMIT_ROLES: ["country_director"]
