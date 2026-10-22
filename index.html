@@ -6,40 +6,32 @@
 <title>CO Annual Requirements</title>
 <style>html{color-scheme:light}body{margin:0}[hidden]{display:none!important}</style>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: top bar with save status; start screen card; form = section rail + question cards with traffic-light boxes */
 :root{
-  --bg:#f3f5f6; --surface:#ffffff; --surface-2:#eef1f3; --line:#d9dfe3; --fg:#1c2529; --muted:#5d6b72;
-  --accent:#1f4e5f; --accent-fg:#ffffff; --accent-soft:#e2ecef;
-  --red:#c8372d; --red-soft:#f8e1de; --amber:#d99a00; --amber-soft:#fbf0d2; --green:#2e8540; --green-soft:#dff0e2;
-  --na:#8a979d; --na-soft:#e7eaec; --empty:#eceff1; --amber-fg:#2b2100; --on-solid:#ffffff;
-  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
-  --r:8px;
+  /* NPA visual identity, as in the Annual Operational Planning Tool: NPA green header, light grey-green ground, Arial */
+  --bg:#F3F4F2; --surface:#FFFFFF; --surface-2:#F6F7F5; --line:#DCDDDA; --fg:#1A1A1A; --muted:#5E5E5E;
+  --accent:#007745; --accent-hover:#006C36; --accent-bright:#009933; --accent-fg:#FFFFFF; --accent-soft:#E3F2E8;
+  --red:#E2001A; --red-soft:#FDE6E8; --amber:#F2A900; --amber-soft:#FDF1D3; --green:#007745; --green-soft:#E3F2E8;
+  --na:#8E918B; --na-soft:#EDEEEC; --empty:#E6E7E4; --amber-fg:#2B2100; --on-solid:#FFFFFF;
+  --f-body:Arial,Helvetica,sans-serif;
+  --f-mono:ui-monospace,Menlo,Consolas,"Courier New",monospace;
+  --r:10px;
+  color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#12181b; --surface:#1a2226; --surface-2:#222c31; --line:#314047; --fg:#e4eaec; --muted:#9aa9b0;
-  --accent:#7fb3c4; --accent-fg:#0e1417; --accent-soft:#1f3139;
-  --red:#e0584d; --red-soft:#3a1f1c; --amber:#e9b132; --amber-soft:#3a3018; --green:#4fae62; --green-soft:#1c3322;
-  --na:#6f7c82; --na-soft:#2a3337; --empty:#232c30; --amber-fg:#1b1500; --on-solid:#0e1417; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#12181b; --surface:#1a2226; --surface-2:#222c31; --line:#314047; --fg:#e4eaec; --muted:#9aa9b0;
-  --accent:#7fb3c4; --accent-fg:#0e1417; --accent-soft:#1f3139;
-  --red:#e0584d; --red-soft:#3a1f1c; --amber:#e9b132; --amber-soft:#3a3018; --green:#4fae62; --green-soft:#1c3322;
-  --na:#6f7c82; --na-soft:#2a3337; --empty:#232c30; --amber-fg:#1b1500; --on-solid:#0e1417; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
 h1,h2,h3{margin:0;text-wrap:balance;line-height:1.25}
 button,input,select,textarea{font:inherit;color:inherit}
-a{color:var(--accent)}
+a{color:var(--accent)}a:hover{color:var(--accent-hover)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .mono{font-family:var(--f-mono);font-size:.82em}
 .eyebrow{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
 .muted{color:var(--muted)}
 
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--accent);color:var(--accent-fg)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--accent);color:var(--accent-fg);border-bottom:4px solid var(--accent-bright)}
+.npa{font-weight:700;font-size:15px;line-height:1.1;white-space:nowrap}
+.npa-div{width:1px;align-self:stretch;background:#7FB89B;min-height:36px}
 .top-in{max-width:1320px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .brand{display:flex;flex-direction:column;margin-right:auto;min-width:0}
 .brand b{font-size:1.02rem}
@@ -212,9 +204,38 @@ table.hm:not(.tr){min-width:940px}
 .lc .grid{stroke:var(--line);stroke-width:1}
 .lc .ax{fill:var(--muted);font-size:12px}
 .lc .lbl{fill:var(--fg);font-size:13px;font-weight:700}
+.kv3{display:flex;gap:14px}
+.hb{display:grid;gap:5px}
+.hb-row{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) auto;gap:10px;align-items:center;font-size:.8rem}
+.hb-row[data-c2]{cursor:pointer}
+.hb-row[data-c2]:hover .hb-l{color:var(--accent)}
+.hb-row.rqrow{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto}
+.hb-l{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hb-bar{display:flex;gap:2px;height:14px;border-radius:3px;overflow:hidden;background:var(--empty)}
+.hb-bar i{display:block;height:100%}
+.hb-v{display:flex;gap:6px;align-items:center;justify-content:flex-end;min-width:110px}
+.hb-v .pill{min-width:44px;justify-content:center}
+.tag{font-size:.66rem;font-weight:700;padding:1px 6px;border-radius:4px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.steps{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.step{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.step .t{font-weight:600;font-size:.88rem}
+.step .d{font-size:.8rem;color:var(--muted);margin-top:2px}
+.step .act{font-size:.78rem;margin-top:4px;color:var(--accent);font-weight:600}
+.pr{font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:4px;height:fit-content;white-space:nowrap}
+.pr.h{background:var(--red);color:var(--on-solid)} .pr.m{background:var(--amber);color:var(--amber-fg)} .pr.l{background:var(--green-soft);color:var(--green)}
+table.mx{border-collapse:separate;border-spacing:2px;font-size:.76rem}
+.mx th{font-weight:600;color:var(--muted);vertical-align:bottom;padding:2px}
+.mx th.vt{height:130px;width:26px}
+.mx th.vt span{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;display:inline-block}
+.mx th[data-c2]{cursor:pointer}
+.mx th[data-c2]:hover{color:var(--accent)}
+.mx td{width:26px;height:24px;text-align:center;border-radius:3px;font-weight:700;font-variant-numeric:tabular-nums}
+.mx td.rq,.mx th.rq{text-align:left;width:auto;min-width:260px;max-width:340px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:8px}
+.mx td.cnt{font-weight:400;color:var(--muted);white-space:nowrap;padding:0 6px}
+.c-n{background:var(--na);color:var(--on-solid)}
 .tip{position:fixed;z-index:60;pointer-events:none;background:var(--fg);color:var(--bg);font-size:.8rem;padding:6px 10px;border-radius:6px;max-width:320px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
 @media (max-width:980px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:minmax(0,1fr)}}
-@media (max-width:620px){.vtabs button{padding:6px 8px;font-size:.78rem}.filters{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.filters .seg{grid-column:1/-1}.filters .fld{min-width:0}.seg button{flex:1;padding:8px 6px}.kpis{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+@media (max-width:620px){.hb-row,.hb-row.rqrow{grid-template-columns:minmax(0,1fr) auto}.hb-row .hb-bar{grid-column:1/-1;order:3}.vtabs button{padding:6px 8px;font-size:.78rem}.filters{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.filters .seg{grid-column:1/-1}.filters .fld{min-width:0}.seg button{flex:1;padding:8px 6px}.kpis{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 @media (max-width:980px){
   .form-grid{grid-template-columns:minmax(0,1fr)}
   .rail{display:none}
@@ -230,7 +251,8 @@ table.hm:not(.tr){min-width:940px}
   .follow{grid-template-columns:minmax(0,1fr)}
   .rv-row{grid-template-columns:minmax(0,1fr) auto}
   .rv-row .stack{grid-column:1/-1;order:3}
-  .brand span,.who{display:none}
+  .brand span,.who,.npa-div{display:none}
+  .npa{font-size:12px}
   .card{padding:18px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -240,6 +262,7 @@ table.hm:not(.tr){min-width:940px}
 <body>
 <header class="top">
   <div class="top-in">
+    <div class="npa">Norwegian<br>People's Aid</div><span class="npa-div" aria-hidden="true"></span>
     <div class="brand"><b>Country Office Annual Requirements</b><span id="brand-sub">Annual self-assessment</span></div>
     <nav class="vtabs" role="tablist"><button role="tab" id="tab-form" aria-selected="true">Requirements Checklist</button><button role="tab" id="tab-dash" aria-selected="false">Dashboards</button></nav>
     <span class="savest" id="savest" data-s="saved" hidden><i></i><span id="savest-t">All changes saved</span></span>
@@ -787,22 +810,25 @@ function renderDash(){
   if (DASH.error) { if (DASH.error.auth) { renderSignIn(DASH.error.message, true); return; } root.innerHTML = `<div class="card"><div class="eyebrow">Dashboards</div><h1>The dashboard could not load</h1><p class="note err">${esc(DASH.error.message)}</p><div><button class="btn" id="d-retry">Try again</button></div></div>`; document.getElementById("d-retry").onclick = () => { DASH.error = null; DASH.data = null; renderDash(); }; return; }
   if (!DASH.country) DASH.country = (APP.country && DATA.countries.some(c => c.v === APP.country)) ? APP.country : DATA.countries[0].v;
   const years = yearsAvail();
-  const body = DASH.mode === "overview" ? viewOverview() : DASH.mode === "country" ? viewCountry() : viewTrend();
+  const body = DASH.mode === "overview" ? viewOverview() : DASH.mode === "country" ? viewCountry() : DASH.mode === "section" ? viewSection() : viewTrend();
   root.innerHTML = `
-    <div class="dash-head"><div><div class="eyebrow">Dashboards${DEMO ? " · example data" : ""}</div><h1>${DASH.mode === "overview" ? "All country offices" : DASH.mode === "country" ? "Country office profile" : "Progress over time"}</h1></div>
+    <div class="dash-head"><div><div class="eyebrow">Dashboards${DEMO ? " · example data" : ""}</div><h1>${DASH.mode === "overview" ? "All country offices" : DASH.mode === "country" ? "Country office profile" : DASH.mode === "section" ? "By section" : "Progress over time"}</h1></div>
       <span class="muted" style="font-size:.8rem">${DEMO ? "Example data, not connected to ArcGIS" : `${DASH.total} record${DASH.total === 1 ? "" : "s"} loaded from ArcGIS Online`} · ${DASH.loadedAt ? new Date(DASH.loadedAt).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) : ""} · <button class="linkbtn" id="d-refresh" style="color:var(--accent)">Refresh</button></span></div>
     <div class="filters">
-      <div class="seg" role="group" aria-label="View">${[["overview","All offices"],["country","Country profile"],["trend","Trends"]].map(([k, l]) => `<button data-mode="${k}" aria-pressed="${DASH.mode === k}">${l}</button>`).join("")}</div>
-      ${DASH.mode !== "overview" ? `<div class="fld"><label for="d-country">Country office</label><select id="d-country">${DATA.countries.map(c => `<option value="${c.v}" ${c.v === DASH.country ? "selected" : ""}>${esc(c.l)}</option>`).join("")}</select></div>` : ""}
+      <div class="seg" role="group" aria-label="View">${[["overview","All offices"],["country","Country profile"],["section","By section"],["trend","Trends"]].map(([k, l]) => `<button data-mode="${k}" aria-pressed="${DASH.mode === k}">${l}</button>`).join("")}</div>
+      ${DASH.mode === "section" ? `<div class="fld"><label for="d-section">Section</label><select id="d-section">${SECTIONS.map(x => `<option value="${x.code}" ${x.code === (DASH.section || SECTIONS[0].code) ? "selected" : ""}>${esc(secName(x))}</option>`).join("")}</select></div>` : ""}
+      ${DASH.mode !== "overview" && DASH.mode !== "section" ? `<div class="fld"><label for="d-country">Country office</label><select id="d-country">${DATA.countries.map(c => `<option value="${c.v}" ${c.v === DASH.country ? "selected" : ""}>${esc(c.l)}</option>`).join("")}</select></div>` : ""}
       ${DASH.mode !== "trend" ? `<div class="fld"><label for="d-year">Year</label><select id="d-year">${years.map(y => `<option ${y === String(DASH.year) ? "selected" : ""}>${y}</option>`).join("")}</select></div>` : ""}
     </div>
     ${DASH.dups && DASH.dups.length ? `<p class="note warn">Duplicate records found: ${DASH.dups.map(d => `${esc(lbl(DATA.countries, d.country))} ${esc(d.year)} (${d.n} records)`).join(", ")}. The dashboard uses the submitted one, or the most complete. Delete the extra records in ArcGIS Online (layer › Data tab) to keep things tidy.</p>` : ""}
     ${body}
     <p class="muted" style="font-size:.78rem;margin-top:16px">How compliance is calculated: each requirement scored 3 (fully) counts 100%, 2 (partially) 50% and 1 (not in compliance) 0%; N/A and unanswered requirements are left out. ${THRESH}.</p>`;
-  root.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { DASH.mode = b.dataset.mode; renderDash(); });
+  root.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { DASH.mode = b.dataset.mode; dashHash(); renderDash(); });
   const on = (id, fn) => { const el = document.getElementById(id); if (el) el.onchange = fn; };
   on("d-country", e => { DASH.country = e.target.value; renderDash(); });
   on("d-year", e => { DASH.year = e.target.value; renderDash(); });
+  on("d-section", e => { DASH.section = e.target.value; dashHash(); renderDash(); });
+  root.querySelectorAll("[data-c2]").forEach(el => el.onclick = () => { DASH.country = el.dataset.c2; DASH.mode = "country"; dashHash(); renderDash(); window.scrollTo({top:0}); });
   document.getElementById("d-refresh").onclick = async () => { DASH.data = null; renderDash(); };
   root.querySelectorAll("[data-att]").forEach(b => b.onclick = () => { DASH.attTab = b.dataset.att;
     root.querySelectorAll("[data-att]").forEach(x => x.setAttribute("aria-selected", x === b));
@@ -863,6 +889,80 @@ function viewCountry(){
           <div class="sc-t"><b>${esc(secName(s))}</b><span>${st[s.code+"_red"]} red · ${st[s.code+"_amber"]} amber · ${st[s.code+"_green"]} green${st[s.code+"_na"] ? ` · ${st[s.code+"_na"]} N/A` : ""}</span><span class="muted">${st[s.code+"_done"]}/${m} answered${d != null ? ` · ${dArrow(d)}` : ""}</span></div></div>`; }).join("")}</div></div>`;
 }
 
+
+/* ---- By section: one thematic area across the whole portfolio ---- */
+function hbar(st, label, tipPrefix){ // horizontal 100% bar of red/amber/green/na/unanswered
+  const tot = st.r + st.am + st.g + st.na + (st.open || 0);
+  if (!tot) return `<div class="hb-bar"></div>`;
+  const seg = (n, c, l) => n ? `<i style="flex:${n};background:var(--${c})" data-tip="${esc(tipPrefix)}: ${n} ${l} (${pct(n, tot)}%)"></i>` : "";
+  return `<div class="hb-bar" aria-label="${esc(label)}">${seg(st.r,"red","not in compliance")}${seg(st.am,"amber","partially")}${seg(st.g,"green","fully")}${seg(st.na,"na","N/A")}${seg(st.open || 0,"empty","not answered")}</div>`;
+}
+function viewSection(){
+  const y = String(DASH.year), code = DASH.section || SECTIONS[0].code, s = SECTIONS.find(x => x.code === code), its = bySec(code), py = String(Number(y) - 1);
+  // offices that have answered at least one requirement in this section this year
+  const offices = DATA.countries.map(c => { const a = recFor(c.v, y), p = recFor(c.v, py);
+    const st = a ? calcSection(a, code) : null, ps = p ? calcSection(p, code) : null;
+    const avg = st ? st[code+"_avg"] : null, pavg = ps ? ps[code+"_avg"] : null;
+    return {c, a, st: st ? {r:st[code+"_red"], am:st[code+"_amber"], g:st[code+"_green"], na:st[code+"_na"], open: its.length - st[code+"_done"]} : null,
+      avg, pavg, d: (avg != null && pavg != null) ? avg - pavg : null, status: statusOf(a)}; });
+  const rep = offices.filter(o => o.avg != null);
+  if (!rep.length) return `<div class="panel"><h2>No office has answered ${esc(secName(s))} for ${esc(y)} yet</h2><p class="sub">Choose another year, or check back once offices have started.</p></div>`;
+  const avgOf = list => { let sum = 0, n = 0; list.forEach(o => { sum += o.st.r + o.st.am * 2 + o.st.g * 3; n += o.st.r + o.st.am + o.st.g; }); return n ? sum / n : null; };
+  const port = avgOf(rep);
+  const prevRep = DATA.countries.map(c => { const p = recFor(c.v, py); if (!p) return null; const ps = calcSection(p, code); return ps[code+"_avg"] != null ? {st:{r:ps[code+"_red"], am:ps[code+"_amber"], g:ps[code+"_green"]}} : null; }).filter(Boolean);
+  const pport = avgOf(prevRep), dport = (port != null && pport != null) ? port - pport : null;
+  const nR = rep.filter(o => rag(o.avg) === "Red").length, nA = rep.filter(o => rag(o.avg) === "Amber").length, nG = rep.filter(o => rag(o.avg) === "Green").length;
+  // requirement-level picture across offices
+  const reqs = its.map(it => { const sc = {r:0, am:0, g:0, na:0, open:0};
+    offices.forEach(o => { if (!o.a || o.avg == null) return; const v = o.a[it.id]; if (v === "1") sc.r++; else if (v === "2") sc.am++; else if (v === "3") sc.g++; else if (v === "na") sc.na++; else sc.open++; });
+    const scored = sc.r + sc.am + sc.g; return {it, sc, scored, gap: scored ? (sc.r + sc.am * .5) / scored : 0, avg: scored ? (sc.r + sc.am * 2 + sc.g * 3) / scored : null}; });
+  const reqSorted = reqs.slice().sort((a, b) => b.gap - a.gap);
+  const offSorted = rep.slice().sort((a, b) => a.avg - b.avg);
+  const missing = offices.filter(o => o.a && o.avg == null), notStarted = offices.filter(o => !o.a);
+  // suggested actions, most important first
+  const acts = [];
+  reqSorted.filter(r => r.scored >= 3 && (r.sc.r + r.sc.am) / r.scored >= .5).slice(0, 3).forEach(r => acts.push({p:"h",
+    t:`Portfolio-wide gap: ${r.it.id.replace("_","-")}`, d:`${r.sc.r + r.sc.am} of ${r.scored} offices are not fully compliant (${r.sc.r} red, ${r.sc.am} amber): “${r.it.q.length > 110 ? r.it.q.slice(0, 108) + "…" : r.it.q}”`,
+    w: r.it.nogov ? "No governing document yet: publish HO guidance or a standard first, then offer training to all offices." : "Run a cross-office training or webinar and share a good-practice example from a green office."}));
+  const reds = offSorted.filter(o => rag(o.avg) === "Red");
+  if (reds.length) acts.push({p:"h", t:`Support ${reds.length} office${reds.length === 1 ? "" : "s"} in red`, d:reds.map(o => `${o.c.l} ${fp(o.avg)}`).join(" · "), w:"Schedule a follow-up call with each office and agree corrective actions in the master action list."});
+  const decl = offices.filter(o => o.d != null && o.d <= -0.2).sort((a, b) => a.d - b.d);
+  if (decl.length) acts.push({p:"m", t:`${decl.length} office${decl.length === 1 ? "" : "s"} declining by 10 pts or more since ${py}`, d:decl.map(o => `${o.c.l} ${fpp(o.d)}`).join(" · "), w:"Ask each office what changed (staff turnover, new systems) and whether support is needed."});
+  if (missing.length || notStarted.length) acts.push({p:"m", t:`Not reported: ${missing.length + notStarted.length} office${missing.length + notStarted.length === 1 ? "" : "s"}`, d:[...missing, ...notStarted].map(o => o.c.l).join(", ") + ".", w:"Remind the section lead in these offices to complete this section before the deadline."});
+  const champs = offSorted.filter(o => cp(o.avg) >= 90).map(o => o.c.l);
+  if (champs.length) acts.push({p:"l", t:`Good practice: ${champs.length} office${champs.length === 1 ? "" : "s"} at 90% or above`, d:champs.join(", ") + ".", w:"Ask them to share templates and routines with offices that score red or amber."});
+  const nogovN = its.filter(i => i.nogov).length;
+  if (nogovN) acts.push({p:"l", t:`${nogovN} of ${its.length} requirements have no governing document`, d:"Offices are asked to comply without an HO standard to follow.", w:"Prioritise writing guidance for the requirements with the most red and amber scores."});
+  // trend: portfolio compliance in this section, every year with data
+  const yrs = yearsAvail().filter(yy => DATA.countries.some(c => { const a = recFor(c.v, yy); return a && calcSection(a, code)[code+"_avg"] != null; }));
+  const trendPts = yrs.map(yy => ({x: yy, y: avgOf(DATA.countries.map(c => { const a = recFor(c.v, yy); if (!a) return null; const q = calcSection(a, code); return q[code+"_avg"] != null ? {st:{r:q[code+"_red"], am:q[code+"_amber"], g:q[code+"_green"]}} : null; }).filter(Boolean))}));
+  const prLabel = {h:"High", m:"Medium", l:"Low"};
+  return `
+  <p class="note"><b>${esc(secName(s))}</b> · ${its.length} requirements · Suggested respondent in offices: ${esc(s.respondent)}. Use this page to see where the portfolio stands, which offices need support and which requirements need HO action.</p>
+  <div class="kpis">
+    <div class="kpi"><span class="l">Portfolio compliance, ${esc(y)}</span><span class="v">${fp(port)}</span><span class="s"><span class="pill ${ragClass(port)}">${rag(port)}</span>${dport != null ? dArrow(dport) + ` <span class="delta">vs ${py}</span>` : ""}</span></div>
+    <div class="kpi"><span class="l">Offices by status</span><span class="v kv3"><span style="color:var(--red)">${nR}</span><span style="color:var(--amber)">${nA}</span><span style="color:var(--green)">${nG}</span></span><span class="s">red · amber · green, of ${rep.length} reporting</span></div>
+    <div class="kpi"><span class="l">Weakest requirement</span><span class="v" style="font-size:1.25rem">${reqSorted[0].it.id.replace("_","-")}</span><span class="s">${fp(reqSorted[0].avg)} compliance across offices</span></div>
+    <div class="kpi"><span class="l">Offices not yet reporting</span><span class="v">${missing.length + notStarted.length}<small> / ${DATA.countries.length}</small></span><span class="s">${missing.length} started but skipped this section</span></div>
+  </div>
+  <div class="two">
+    <div class="panel"><h2>What to do next</h2><p class="sub">Generated from this year's scores, most urgent first.</p>
+      <ul class="steps">${acts.slice(0, 9).map(x => `<li class="step"><span class="pr ${x.p}">${prLabel[x.p]}</span><div><div class="t">${esc(x.t)}</div><div class="d">${esc(x.d)}</div><div class="act">${esc(x.w)}</div></div></li>`).join("") || `<li class="muted">No actions: every reporting office is green.</li>`}</ul></div>
+    <div class="panel"><h2>Portfolio compliance over time</h2><p class="sub">All reporting offices combined, ${esc(secName(s))}. Background bands: ${THRESH}.</p>${trendPts.length ? lineChart(trendPts) : `<p class="muted">No earlier years yet.</p>`}</div>
+  </div>
+  <div class="two" style="margin-top:16px">
+    <div class="panel"><div class="panel-head"><div><h2>Offices, weakest first</h2><p class="sub">Share of this section's requirements by score, with compliance and change since ${py}.</p></div></div>
+      <div class="hb">${offSorted.map(o => `<div class="hb-row" data-c2="${o.c.v}" title="Open ${esc(o.c.l)}'s country profile"><span class="hb-l">${esc(o.c.l)}${o.status !== "Submitted" ? ` <span class="st">in progress</span>` : ""}</span>${hbar(o.st, o.c.l, o.c.l)}<span class="hb-v"><b class="pill ${ragClass(o.avg)}">${fp(o.avg)}</b>${o.d != null ? dArrow(o.d) : `<span class="delta">new</span>`}</span></div>`).join("")}</div>${legend()}</div>
+    <div class="panel"><div class="panel-head"><div><h2>Requirements, biggest gaps first</h2><p class="sub">How many offices scored each requirement 1, 2 or 3. <span class="tag">no HO doc</span> = no governing document yet.</p></div></div>
+      <div class="hb">${reqSorted.map(r => `<div class="hb-row rqrow"><span class="hb-l" title="${esc(r.it.q)}"><span class="mono">${r.it.id.replace("_","-")}</span> ${esc(r.it.q.length > 58 ? r.it.q.slice(0, 56) + "…" : r.it.q)}${r.it.nogov ? ` <span class="tag">no HO doc</span>` : ""}</span>${hbar(r.sc, r.it.id, r.it.id.replace("_","-"))}<span class="hb-v"><b class="pill ${ragClass(r.avg)}">${fp(r.avg)}</b></span></div>`).join("")}</div>${legend()}</div>
+  </div>
+  <div class="panel" style="margin-top:16px"><h2>Requirement by office</h2><p class="sub">Every score in ${esc(secName(s))} for ${esc(y)}. Rows are requirements (biggest gaps first), columns are offices (weakest first). Hover a cell for details; click an office name for its profile.</p>
+    <div class="hm-scroll"><table class="mx"><thead><tr><th class="rq">Requirement</th>${offSorted.map(o => `<th class="vt" data-c2="${o.c.v}"><span>${esc(o.c.l)}</span></th>`).join("")}<th class="vt"><span>Offices red / amber</span></th></tr></thead>
+    <tbody>${reqSorted.map(r => `<tr><td class="rq" title="${esc(r.it.q)}"><span class="mono">${r.it.id.replace("_","-")}</span> ${esc(r.it.q.length > 70 ? r.it.q.slice(0, 68) + "…" : r.it.q)}</td>${offSorted.map(o => { const v = o.a[r.it.id]; const cls = v === "1" ? "c-r" : v === "2" ? "c-a" : v === "3" ? "c-g" : v === "na" ? "c-n" : "c-x";
+      return `<td class="${cls}" data-tip="${esc(o.c.l)} · ${r.it.id.replace("_","-")}: ${v === "na" ? "N/A" : v ? LABEL[v] : "not answered"}${o.a[r.it.id + "_comment"] ? " — “" + esc(o.a[r.it.id + "_comment"]) + "”" : ""}">${v === "na" ? "–" : v || ""}</td>`; }).join("")}<td class="cnt">${r.sc.r} / ${r.sc.am}</td></tr>`).join("")}</tbody></table></div>
+    ${legend()}</div>`;
+}
+
 function viewTrend(){
   const c = DASH.country, lab = lbl(DATA.countries, c);
   const recs = (DASH.data || []).filter(a => a.country === c).sort((x, y) => Number(x.assessment_year) - Number(y.assessment_year));
@@ -899,7 +999,14 @@ function showMain(){ setTabs(); if (APP.view === "dash") renderDash(); else if (
 async function switchView(v){ APP.view = v; LS.set("coar-view", v); history.replaceState(null, "", location.pathname + (v === "dash" ? "#dashboard" : "")); setTabs(); if (!APP.user) return; if (APP.oid) await flush(); showMain(); }
 
 /* ================= BOOT ================= */
-APP.view = location.hash === "#dashboard" ? "dash" : (LS.get("coar-view") || "form");
+// Links: #dashboard opens the dashboards; #section-FIN (any section code) opens that section's dashboard directly.
+function dashHash(){ LS.set("coar-dash", {mode:DASH.mode, section:DASH.section}); if (APP.view === "dash") history.replaceState(null, "", location.pathname + (DASH.mode === "section" ? "#section-" + (DASH.section || SECTIONS[0].code) : "#dashboard")); }
+(function(){ const h = location.hash.replace("#", ""), m = h.match(/^section-([A-Za-z]+)$/);
+  if (m && SECTIONS.some(s => s.code === m[1].toUpperCase())) { DASH.mode = "section"; DASH.section = m[1].toUpperCase(); LS.set("coar-dash", {mode:"section", section:DASH.section}); APP.view = "dash"; }
+  else if (h === "dashboard") APP.view = "dash";
+  else APP.view = LS.get("coar-view") || "form";
+  const saved = LS.get("coar-dash"); if (!m && saved && APP.view === "dash" && !h) { DASH.mode = saved.mode || DASH.mode; DASH.section = saved.section; }
+})();
 document.getElementById("tab-form").onclick = () => switchView("form");
 document.getElementById("tab-dash").onclick = () => switchView("dash");
 setTabs();
