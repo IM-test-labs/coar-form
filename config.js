@@ -4,10 +4,10 @@
 window.COAR_CONFIG = {
   PORTAL_URL: "https://npaid.maps.arcgis.com",
   CLIENT_ID: "49UKtowniB9CINxQ",
-
+ 
   // Main layer (HO reviewers only): used for the Dashboards
   LAYER_URL: "https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/service_66dd1823df094915b3dcf7e24d0e7bd1/FeatureServer/0",
-
+ 
   // One view per country office (filtered to that country, shared with its group).
   // Paste each view's address when you create it; empty = that office uses the main layer.
   COUNTRY_LAYER_URLS: {
@@ -36,7 +36,8 @@ window.COAR_CONFIG = {
     yemen:                  "",
     zimbabwe:               ""
   },
-
+ 
   DEFAULT_YEAR: "2027",
   SUBMIT_ROLES: ["country_director"]
 };
+ 
