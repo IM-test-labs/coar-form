@@ -3,7 +3,7 @@
    Leave LAYER_URL empty ("") to run the page in demo mode. */
 window.COAR_CONFIG = {
   PORTAL_URL: "https://npaid.maps.arcgis.com",
-  CLIENT_ID: "bAZAOXg4cHYFnbl2",
+  CLIENT_ID: "49UKtowniB9CINxQ",
 
   // Main layer (HO reviewers only): used for the Dashboards
   LAYER_URL: "https://services1.arcgis.com/9pLtiug18wgR3gBR/arcgis/rest/services/service_66dd1823df094915b3dcf7e24d0e7bd1/FeatureServer/0",
