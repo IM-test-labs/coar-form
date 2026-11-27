@@ -38,6 +38,9 @@ window.COAR_CONFIG = {
   },
  
   DEFAULT_YEAR: "2027",
-  SUBMIT_ROLES: ["country_director"]
+  SUBMIT_ROLES: ["country_director"],
+ 
+  // ArcGIS usernames that see the "Example data" panel on the Dashboards tab (add / remove demonstration records)
+  ADMIN_USERS: ["qasimm"]
 };
  
