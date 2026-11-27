@@ -121,7 +121,11 @@ a.doc:hover{border-color:var(--accent);color:var(--accent)}
 .follow{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1.6fr) minmax(0,1.1fr) minmax(0,.9fr);gap:10px;background:var(--surface-2);border-radius:6px;padding:10px 12px}
 .follow.one{grid-template-columns:minmax(0,1fr)}
 .follow.rq-f{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);align-items:start}
-.lks{display:grid;gap:6px}.lk-x{padding:6px 10px}.lk-add{align-self:flex-start;font-size:.8rem;margin-top:2px}
+.lks{display:grid;gap:6px}.lk-x{padding:6px 10px}
+.adm{display:flex;gap:16px;justify-content:space-between;align-items:center;flex-wrap:wrap;border:2px dashed var(--accent);border-radius:8px;padding:12px 14px;margin:0 0 14px;font-size:.88rem;background:var(--surface)}
+.adm-b{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.adm-msg{margin-top:4px;font-weight:600}
+.btn.danger{background:var(--red);border-color:var(--red);color:#fff}.lk-add{align-self:flex-start;font-size:.8rem;margin-top:2px}
 .lk a.btn{text-decoration:none;display:inline-flex;align-items:center}.lk a.btn[hidden]{display:none}
 .q-note{color:var(--red);font-weight:600}
 @media (max-width:720px){.follow.rq-f{grid-template-columns:minmax(0,1fr)}}
@@ -466,6 +470,19 @@ class ArcGISStore {
     if (!x || !x.success) throw new Error((x && x.error && x.error.description) || "Could not create the assessment record.");
     return x.objectId;
   }
+  async addMany(list){
+    const r = await agsPost(this.url + "/applyEdits", {adds: JSON.stringify(list.map(a => ({attributes: this.toLayer(a)})))});
+    const bad = (r.addResults || []).filter(x => !x.success);
+    if (bad.length || !(r.addResults || []).length) throw new Error((bad[0] && bad[0].error && bad[0].error.description) || "Could not add the example records.");
+    return r.addResults.length;
+  }
+  async idsWhere(where){ const r = await agsPost(this.url + "/query", {where, returnIdsOnly:"true"}); return r.objectIds || []; }
+  async deleteIds(ids){
+    const r = await agsPost(this.url + "/applyEdits", {deletes: JSON.stringify(ids)});
+    const bad = (r.deleteResults || []).filter(x => !x.success);
+    if (bad.length) throw new Error((bad[0].error && bad[0].error.description) || "Could not delete the example records. Check that deleting is enabled on the main layer.");
+    return ids.length;
+  }
   async update(oid, attrs){
     const a = this.toLayer(attrs); a[this.oid] = oid;
     const r = await agsPost(this.url + "/applyEdits", {updates: JSON.stringify([{attributes: a}])});
@@ -628,7 +645,7 @@ async function openAssessment(){
   const lastEdit = SECTIONS.map(s => ({t: APP.rec[s.code+"_edited_at"], by: APP.rec[s.code+"_edited_by"]})).filter(x => x.t).sort((a,b) => b.t - a.t)[0];
   APP.welcome = isNew ? {isNew:true} : {done, lastEdit};
   APP.lastSaved = Date.now();
-  if (!readOnly()) { APP.rec.respondent_role = APP.role; APP.pending.respondent_role = APP.role; APP.pending.respondent_name = APP.user.name; if (APP.user.email) APP.pending.respondent_email = APP.user.email; }
+  if (!readOnly()) { APP.rec.respondent_role = APP.role; APP.pending.respondent_role = APP.role; APP.pending.respondent_name = APP.user.name; if (APP.user.email && !isDummy(APP.rec)) APP.pending.respondent_email = APP.user.email; }
   if (Object.keys(APP.pending).length) flush();
   setSave(Object.keys(APP.pending).length ? "saving" : "saved");
   document.getElementById("brand-sub").textContent = `${lbl(DATA.countries, APP.country)} · ${APP.year}`;
@@ -651,6 +668,7 @@ function renderForm(){
     ? `<p class="note ok">A new ${esc(APP.year)} assessment was started for ${esc(lbl(DATA.countries, APP.country))}. Your answers save automatically; you can close this page and come back at any time.</p>`
     : `<p class="note">Welcome back. ${APP.welcome.done} of ${ITEMS.length} requirements are answered${APP.welcome.lastEdit ? `; last change by ${esc(APP.welcome.lastEdit.by)} on ${fmtDate(APP.welcome.lastEdit.t)}` : ""}. You are in section ${Math.min(APP.sec + 1, SECTIONS.length)}.</p>`;
   $app().innerHTML = `
+  ${isDummy(APP.rec) ? `<p class="note warn">This is example data for demonstration. Changes are saved, but the record will be removed before the tool goes live.</p>` : ""}
   ${DEMO ? `<div class="demo-bar"><b>Demo controls</b><label><input type="checkbox" id="d-off" ${APP.demoOffline?"checked":""}> Simulate lost connection</label><button class="linkbtn" id="d-reset" style="color:var(--accent)">Reset demo data</button><span>Reload the page to see the form resume where you left off.</span></div>` : ""}
   <div class="form-grid">
     <nav class="rail" aria-label="Sections">
@@ -920,6 +938,7 @@ function renderDlv(){
   const noFields = !DEMO && APP.store && APP.store.fields && !APP.store.f("DLV_01");
   $app().innerHTML = `
   ${noFields ? `<p class="note err">The ArcGIS layer does not have the deliverable fields yet, so changes on this page cannot be saved. Ask the administrator to republish the survey from the latest form spreadsheet (version 2027.2 or later).</p>` : ""}
+  ${isDummy(APP.rec) ? `<p class="note warn">This is example data for demonstration. Changes are saved, but the record will be removed before the tool goes live.</p>` : ""}
   ${DEMO ? `<div class="demo-bar"><b>Demo controls</b><label><input type="checkbox" id="d-off" ${APP.demoOffline ? "checked" : ""}> Simulate lost connection</label><span>Data stays in this browser.</span></div>` : ""}
   <div class="hero">
     <div class="hero-top">
@@ -1051,6 +1070,91 @@ function renderGuide(){
   $app().querySelectorAll("[data-go]").forEach(b => b.onclick = () => switchView(b.dataset.go));
 }
 
+/* ================= EXAMPLE (DUMMY) DATA for demonstrations =================
+   Example records carry two markers, so they can always be found and removed together:
+   respondent_email = DUMMY_EMAIL and ho_review_comment = DUMMY_NOTE. Only users listed in
+   ADMIN_USERS in config.js see the controls that add or remove them. */
+const DUMMY_EMAIL = "example-data@coar.invalid", DUMMY_NOTE = "EXAMPLE DATA - remove before go-live";
+const isDummy = a => !!a && (a.respondent_email === DUMMY_EMAIL || a.ho_review_comment === DUMMY_NOTE);
+const isAdmin = () => !DEMO && !!APP.user && (CONFIG.ADMIN_USERS || []).map(u => String(u).toLowerCase()).includes(String(APP.user.username || "").toLowerCase());
+const DUMMY_COMMENTS = {"1":["Not yet in place; plan agreed with the Regional Director","Draft prepared, waiting for SMT approval","Gap identified in last audit, action planned for Q3"],
+  "2":["In place in the capital office, not yet in field offices","Exists but needs updating to the latest template","Partly done; remaining staff to be trained"],
+  "3":["Reviewed by SMT in March","Approved and filed on SharePoint"]};
+function makeDummy(years){
+  const out = []; let seed = 20271;
+  const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+  const pick = arr => arr[Math.floor(rnd() * arr.length)];
+  DATA.countries.forEach((c, ci) => {
+    const base = 1.8 + rnd() * 0.75, slope = 0.1 + rnd() * 0.15;
+    years.forEach((y, yi) => {
+      const last = yi === years.length - 1;
+      if (last && years.length > 1 && ci % 5 === 4) return;                    // latest year: some offices not started
+      const draft = last && (years.length === 1 ? ci % 4 === 1 : ci % 3 !== 0);  // latest year: many in progress
+      const a = {country:c.v, assessment_year:String(y), submission_status: draft ? "draft" : "submitted", respondent_role:"country_director",
+        respondent_name:"Example data", respondent_email:DUMMY_EMAIL, ho_review_comment:DUMMY_NOTE, ho_review_status:"not_reviewed"};
+      const secsDone = draft ? 4 + Math.floor(rnd() * 7) : SECTIONS.length;
+      SECTIONS.forEach((sx, si) => {
+        if (si >= secsDone) return;
+        const adj = (rnd() - 0.5) * 0.8;
+        bySec(sx.code).forEach(it => {
+          const v = base + slope * yi + adj + (rnd() - 0.5) * 1.3;
+          const sc = rnd() < 0.04 ? "na" : v < 1.65 ? "1" : v < 2.45 ? "2" : "3"; a[it.id] = sc;
+          if (sc !== "na" && rnd() < (sc === "3" ? 0.08 : 0.4)) a[it.id + "_comment"] = pick(DUMMY_COMMENTS[sc]);
+          if (sc === "3" && (it.linkLabel || rnd() < 0.15)) a[it.id + "_link"] = `https://npaid.sharepoint.com/sites/example-${c.v}/Shared%20Documents/${it.id}`;
+        });
+        Object.assign(a, calcSection(a, sx.code));
+        a[sx.code + "_edited_by"] = "Example data"; a[sx.code + "_edited_at"] = Date.UTC(Number(y), 1 + Math.floor(rnd() * 3), 1 + Math.floor(rnd() * 27), 10);
+      });
+      Object.assign(a, calcTotals(a));
+      a.last_section = Math.min(secsDone, SECTIONS.length - 1);
+      if (!draft) { a.submitted_by = "Example data"; a.submitted_at = Date.UTC(Number(y), 4, 10 + ci % 20, 12); a.cd_comment = "Example submission for demonstration."; }
+      DATA.deliverables.forEach(d => {
+        const x = rnd() + base / 8 - 0.15 + (last ? -0.1 : 0.15);
+        if (last && x < 0.2) return;
+        a[d.id] = x > 0.6 ? "yes" : x > 0.4 ? "partially" : "no";
+        if (a[d.id] === "yes") a[d.id + "_link"] = `https://npaid.sharepoint.com/sites/example-${c.v}/Deliverables/${d.id}`;
+        if (a[d.id] === "partially" && rnd() < 0.5) a[d.id + "_comment"] = "Draft shared with HO";
+        a[d.id + "_date"] = Date.UTC(Number(y), Math.floor(rnd() * 5), 1 + Math.floor(rnd() * 27), 10);
+      });
+      a.dlv_edited_by = "Example data"; a.dlv_edited_at = Date.UTC(Number(y), 4, 1, 10);
+      out.push(a);
+    });
+  });
+  return out;
+}
+const dummyWhere = st => `${st.f("respondent_email")}='${DUMMY_EMAIL}' OR ${st.f("ho_review_comment")}='${DUMMY_NOTE}'`;
+const ADM = {busy:false, msg:"", confirm:false};
+function adminPanel(){
+  if (!isAdmin()) return "";
+  const n = (DASH.data || []).filter(isDummy).length, y1 = Number(CONFIG.DEFAULT_YEAR || DATA.years[0]);
+  return `<div class="adm"><div><b>Example data</b> <span class="muted">· only you see this panel (administrator)</span><br>
+    <span class="muted">${n ? `${n} example record${n === 1 ? "" : "s"} in the layer.` : "No example records in the layer."} Example records never replace a real office's record for the same year.</span>
+    ${ADM.msg ? `<div class="adm-msg">${esc(ADM.msg)}</div>` : ""}</div>
+    <div class="adm-b">${ADM.confirm ? `<span>Delete all example records? Real records are not touched.</span><button class="btn danger" id="adm-del-yes" ${ADM.busy ? "disabled" : ""}>Yes, remove example data</button><button class="btn" id="adm-del-no">Cancel</button>`
+      : `<button class="btn" id="adm-add" ${ADM.busy ? "disabled" : ""}>Add example data (${y1} and ${y1 + 1})</button><button class="btn" id="adm-del" ${ADM.busy || !n ? "disabled" : ""}>Remove example data</button>`}</div></div>`;
+}
+function bindAdmin(){
+  const g = id => document.getElementById(id);
+  const run = async (fn) => { ADM.busy = true; renderDash(); try { await fn(); } catch(e) { ADM.msg = "Stopped: " + e.message; } ADM.busy = false; ADM.confirm = false; DASH.data = null; await loadDash(true); renderDash(); };
+  if (g("adm-add")) g("adm-add").onclick = () => run(async () => {
+    const st = new ArcGISStore(CONFIG.LAYER_URL); await st.init();
+    const y1 = Number(CONFIG.DEFAULT_YEAR || DATA.years[0]);
+    const taken = new Set((await st.findAll()).filter(a => a.country).map(a => a.country + "|" + a.assessment_year));
+    const recs = makeDummy([y1, y1 + 1]).filter(a => !taken.has(a.country + "|" + a.assessment_year));
+    let done = 0;
+    for (let i = 0; i < recs.length; i += 5) { done += await st.addMany(recs.slice(i, i + 5)); ADM.msg = `Adding example records… ${done} of ${recs.length}`; renderDash(); }
+    ADM.msg = recs.length ? `Added ${done} example records.` : "Nothing to add: every office already has a record for these years.";
+  });
+  if (g("adm-del")) g("adm-del").onclick = () => { ADM.confirm = true; ADM.msg = ""; renderDash(); };
+  if (g("adm-del-no")) g("adm-del-no").onclick = () => { ADM.confirm = false; renderDash(); };
+  if (g("adm-del-yes")) g("adm-del-yes").onclick = () => run(async () => {
+    const st = new ArcGISStore(CONFIG.LAYER_URL); await st.init();
+    const ids = await st.idsWhere(dummyWhere(st)); let done = 0;
+    for (let i = 0; i < ids.length; i += 100) { done += await st.deleteIds(ids.slice(i, i + 100)); ADM.msg = `Removing example records… ${done} of ${ids.length}`; renderDash(); }
+    ADM.msg = `Removed ${done} example records.`;
+  });
+}
+
 /* ---- views ---- */
 function renderDash(){
   const root = $app();
@@ -1068,10 +1172,13 @@ function renderDash(){
       ${DASH.mode === "country" || DASH.mode === "trend" ? `<div class="fld"><label for="d-country">Country office</label><select id="d-country">${DATA.countries.map(c => `<option value="${c.v}" ${c.v === DASH.country ? "selected" : ""}>${esc(c.l)}</option>`).join("")}</select></div>` : ""}
       ${DASH.mode !== "trend" ? `<div class="fld"><label for="d-year">Year</label><select id="d-year">${years.map(y => `<option ${y === String(DASH.year) ? "selected" : ""}>${y}</option>`).join("")}</select></div>` : ""}
     </div>
+    ${adminPanel()}
+    ${(DASH.data || []).some(isDummy) ? `<p class="note warn">These dashboards include example data for demonstration (marked "Example data"). It will be removed before the tool goes live.</p>` : ""}
     ${DASH.dups && DASH.dups.length ? `<p class="note warn">Duplicate records found: ${DASH.dups.map(d => `${esc(lbl(DATA.countries, d.country))} ${esc(d.year)} (${d.n} records)`).join(", ")}. The dashboard uses the submitted one, or the most complete. Delete the extra records in ArcGIS Online (layer › Data tab) to keep things tidy.</p>` : ""}
     ${body}
     <p class="muted" style="font-size:.78rem;margin-top:16px" ${DASH.mode === "dlv" ? "hidden" : ""}>How compliance is calculated: each requirement scored 3 (fully) counts 100%, 2 (partially) 50% and 1 (not in compliance) 0%; N/A and unanswered requirements are left out. ${THRESH}.</p>`;
   root.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { DASH.mode = b.dataset.mode; dashHash(); renderDash(); });
+  bindAdmin();
   const on = (id, fn) => { const el = document.getElementById(id); if (el) el.onchange = fn; };
   on("d-country", e => { DASH.country = e.target.value; renderDash(); });
   on("d-year", e => { DASH.year = e.target.value; renderDash(); });
