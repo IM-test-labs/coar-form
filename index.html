@@ -264,6 +264,35 @@ table.mx{border-collapse:separate;border-spacing:2px;font-size:.76rem}
   .npa{font-size:12px}
   .card{padding:18px}
 }
+.prev.chg{background:var(--amber);color:#1d1600;font-weight:700}
+.ev-miss{color:#8a5a00;font-weight:600}
+.note.copy{display:block;border-left:4px solid var(--accent)}
+.dl-btns{display:inline-flex;gap:6px;flex-wrap:wrap;margin-left:8px;vertical-align:middle}
+.dl-btns .btn{padding:4px 10px;font-size:.78rem}
+.dl-count{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:center;margin-bottom:16px}
+.dl-days{display:grid;justify-items:center;text-align:center;min-width:130px}
+.dl-days b{font-size:2.6rem;line-height:1;color:var(--accent)}.dl-days span{font-size:.8rem;color:var(--muted);max-width:150px}
+.dl-count.soon .dl-days b{color:#b37800}.dl-count.late .dl-days b{color:var(--red)}
+.dl-who{display:grid;gap:8px;font-size:.85rem}
+.chip-c{font:inherit;font-size:.8rem;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;margin:2px;cursor:pointer;color:inherit}
+.chip-c:hover{border-color:var(--accent)}
+.hm td.dcol{background:transparent;color:inherit;font-size:.78rem;white-space:nowrap}
+.ev-low{color:#8a5a00;font-weight:700}
+.chg-l .pill{padding:0 7px}
+@media (max-width:600px){.dl-count{grid-template-columns:minmax(0,1fr)}}
+@media print{header,.top,.vtabs,.filters,.adm,.dl-btns,#d-refresh,#toast,.demo-bar,.rail,.rail-sel,.nav-btns{display:none!important}body{background:#fff}.panel,.kpi,.sec-card,.hb-row{break-inside:avoid}.hm-scroll{overflow:visible}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.pf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-top:10px}
+.pf-card{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface)}
+.pf-t{font-size:.8rem;font-weight:600;min-height:2.3em;line-height:1.15}
+.pf-v{display:flex;gap:8px;align-items:baseline;margin:2px 0}.pf-v b{font-size:1.25rem}
+.spk{width:100%;height:44px;display:block}
+.pf-ov{display:grid;justify-items:end;gap:2px}.pf-ov b{font-size:1.8rem;line-height:1}
+.c-txt-r{color:var(--red)}.c-txt-a{color:#a36e00}.c-txt-g{color:var(--green)}
+.sc .sc-l{font-weight:700}
+.tl-now{stroke:var(--accent)}.tl-prev{stroke:var(--na);stroke-dasharray:5 4}
+.cm-bar{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px;align-items:end}
+.cm-l .cm-t{margin-top:3px}.cm-l mark{background:#ffe08a;color:inherit;padding:0 2px;border-radius:2px}
+@media (max-width:600px){.cm-bar{grid-template-columns:minmax(0,1fr)}}
 /* guidelines */
 @media (max-width:620px){.vtabs{flex-wrap:wrap;max-width:100%}.vtabs button{padding:6px 7px;font-size:.74rem}}
 .gd-hero{gap:6px}.gd-lead{margin:0;font-size:1.02rem}
@@ -532,6 +561,12 @@ function calcTotals(a){
 }
 const rag = v => v == null ? "" : v >= 2.5 ? "Green" : v >= 1.75 ? "Amber" : "Red";
 const answered = (a, it) => a[it.id] != null && a[it.id] !== "";
+/* evidence: requirements that ask for a document link, scored 3, but without a link */
+const needsLink = it => !!it.linkLabel && !it.textOnly;
+const hasLink = (a, it) => String(a[it.id + "_link"] || "").split("\n").some(u => /^https?:\/\/\S+$/i.test(u.trim()));
+const evidenceGaps = a => ITEMS.filter(it => needsLink(it) && a[it.id] === "3" && !hasLink(a, it));
+const evidenceStat = a => { const asked = ITEMS.filter(it => needsLink(it) && a[it.id] === "3"); return {n: asked.length, ok: asked.filter(it => hasLink(a, it)).length}; };
+const scoreTxt = v => v === "na" ? "N/A" : v || "–";
 function secProgress(a, code){ const its = bySec(code); const c = calcSection(a, code); return {...c, n: its.length, done: c[code+"_done"], r:c[code+"_red"], am:c[code+"_amber"], g:c[code+"_green"], na:c[code+"_na"]}; }
 const fmtDate = ms => ms ? new Date(ms).toLocaleString(undefined, {day:"numeric", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"}) : "";
 
@@ -683,6 +718,7 @@ function renderForm(){
           <div><div class="eyebrow">${esc(lbl(DATA.countries, APP.country))} · ${esc(APP.year)} · ${esc(lbl(DATA.roles, APP.role))}</div><h1>Country Office Annual Requirements Checklist</h1></div>
           <button class="btn" id="change">Change country or year</button>
         </div>
+        ${copyOffer()}
         ${ro ? `<p class="note ok">Submitted to HO${a.submitted_by ? ` by ${esc(a.submitted_by)}` : ""}${a.submitted_at ? ` on ${fmtDate(a.submitted_at)}` : ""}. This assessment is now read-only. Contact HO if it needs to be reopened.</p>` : welcome}
         <div class="legend">
           <span><i class="dot" style="background:var(--red)"></i>1 · Not in compliance</span>
@@ -697,6 +733,21 @@ function renderForm(){
     </div>
   </div>`;
   bindForm();
+}
+
+function copyable(){ return ITEMS.filter(it => answered(APP.prev, it) && !answered(APP.rec, it)); }
+function copyOffer(){
+  if (readOnly() || APP.copyHidden) return "";
+  const list = copyable(); if (!list.length) return "";
+  return `<div class="note copy"><div><b>Start from last year's answers?</b> ${list.length} requirement${list.length === 1 ? " is" : "s are"} empty here but answered in ${Number(APP.year) - 1}. Copy their scores and document links, then review each section and change what is different. Comments are not copied.</div>
+    <div class="nav-btns" style="margin:8px 0 0"><button class="btn pri" id="copy-prev">Copy ${list.length} answer${list.length === 1 ? "" : "s"} from ${Number(APP.year) - 1}</button><button class="btn" id="copy-no">No, start empty</button></div></div>`;
+}
+function copyPrev(){
+  const list = copyable();
+  list.forEach(it => { setField(it.id, APP.prev[it.id], it.code); if (APP.prev[it.id + "_link"] && !APP.rec[it.id + "_link"]) setField(it.id + "_link", APP.prev[it.id + "_link"], it.code); });
+  APP.copyHidden = true; APP.welcome = null;
+  toast(`Copied ${list.length} answers from ${Number(APP.year) - 1}. Review each section and change what is different.`);
+  renderForm();
 }
 
 function renderSection(s){
@@ -716,7 +767,7 @@ function renderSection(s){
         ${!it.textOnly && !ro ? `<button class="linkbtn lk-add" data-lkadd="${it.id}">+ Add another link</button>` : ""}</div>
       <div class="fld"><label for="${it.id}_comment">Comment (optional)</label><input id="${it.id}_comment" data-f="${it.id}_comment" value="${esc(a[it.id+"_comment"])}" placeholder="${esc(it.coNote || "Add a note where useful")}" ${dis}></div></div>`;
     return `${subH}<article class="q" data-s="${v}">
-      <div class="q-top"><span class="q-id mono">${it.id.replace("_","-")}</span><div class="q-text">${esc(it.q)}</div>${pv ? `<span class="prev">Last year: ${esc(pv === "na" ? "N/A" : pv)}</span>` : ""}</div>
+      <div class="q-top"><span class="q-id mono">${it.id.replace("_","-")}</span><div class="q-text">${esc(it.q)}</div>${pv ? `<span class="prev ${v && v !== pv ? "chg" : ""}">${v && v !== pv ? "Changed · " : ""}Last year: ${esc(scoreTxt(pv))}</span>` : ""}</div>
       ${it.hint ? `<div class="hint">Also tell us: ${esc(it.hint)}</div>` : ""}
       ${it.note ? `<div class="hint q-note">${esc(it.note)}</div>` : ""}
       <div class="docs">${docs}</div>
@@ -724,6 +775,7 @@ function renderSection(s){
         ${["1","2","3"].map(x => `<button class="ch" data-v="${x}" data-id="${it.id}" aria-pressed="${v===x}" ${dis}><b>${x}</b><small>${LABEL[x]}</small></button>`).join("")}
         <button class="ch" data-v="na" data-id="${it.id}" aria-pressed="${v==="na"}" ${dis}><small>N/A</small></button>
       </div>
+      ${needsLink(it) && v === "3" && !hasLink(a, it) ? `<div class="hint ev-miss">Add the link to the document to support a score of 3.</div>` : ""}
       ${follow}
     </article>`;
   }).join("");
@@ -746,6 +798,7 @@ function renderReview(){
   const ov = calcTotals(a).overall_avg, rc = {Green:"g", Amber:"a", Red:"r"}[rag(ov)] || "n";
   return `<div class="sec-head"><div><div class="eyebrow">${ro ? "Submitted assessment" : "Final step"}</div><h2>${ro ? "Summary" : "Review and submit"}</h2></div>
     <span class="pill ${rc}">Overall compliance ${fp(ov != null ? Number(ov) : null)}${rag(ov) ? " · " + rag(ov) : ""}</span></div>
+    ${(() => { const g = evidenceGaps(a); return g.length ? `<p class="note warn">${g.length} ${g.length === 1 ? "requirement is" : "requirements are"} scored 3 (fully in compliance) without the document link ${g.length === 1 ? "it asks" : "they ask"} for: ${jump(g)}. ${ro ? "" : "Adding the links helps HO confirm the score. You can still submit."}</p>` : ""; })()}
     ${!ro && unanswered.length ? `<p class="note warn">${unanswered.length} ${unanswered.length===1?"requirement is":"requirements are"} not answered yet: ${jump(unanswered)}</p>` : ""}
     <div class="review">${SECTIONS.map((s, i) => { const p = secProgress(a, s.code);
       return `<div class="rv-row"><div><b>${esc(secName(s))}</b><div class="edited">${p.done}/${p.n} answered${a[s.code+"_edited_by"] ? ` · ${esc(a[s.code+"_edited_by"])}, ${fmtDate(a[s.code+"_edited_at"])}` : ""}</div></div>
@@ -759,6 +812,8 @@ function renderReview(){
 
 function bindForm(){
   const root = $app();
+  const cpy = document.getElementById("copy-prev"); if (cpy) cpy.onclick = copyPrev;
+  const cpn = document.getElementById("copy-no"); if (cpn) cpn.onclick = () => { APP.copyHidden = true; renderForm(); };
   root.querySelectorAll("[data-go]").forEach(b => b.onclick = () => goSection(+b.dataset.go));
   root.querySelectorAll("[data-goitem]").forEach(b => b.onclick = () => goSection(SECTIONS.findIndex(s => s.code === b.dataset.goitem)));
   root.querySelectorAll(".ch").forEach(b => b.onclick = () => {
@@ -847,6 +902,7 @@ function demoDashData(){
           const v = base + slope * yi + adj + (rnd() - 0.5) * 1.3;
           a[it.id] = rnd() < 0.04 ? "na" : v < 1.65 ? "1" : v < 2.45 ? "2" : "3";
           if (a[it.id] === "1" && rnd() < 0.5) a[it.id + "_comment"] = "Not yet in place; plan agreed with HO";
+          if (a[it.id] === "3" && it.linkLabel && rnd() < 0.75) a[it.id + "_link"] = "https://npaid.sharepoint.com/sites/example/" + c.v + "/" + it.id;
         });
       });
       if (!partial) { a.submitted_by = "Country Director"; a.submitted_at = Date.UTC(Number(y), 0, 20 + ci % 8); }
@@ -1019,6 +1075,7 @@ function viewDeliverables(){
       return `<tr><td class="rq"><span class="mono">${d.id.replace("_", "-")}</span> ${esc(d.t)} <span class="tag">${esc(d.lead)}</span>${d.due ? ` <span class="muted dd-in">· ${esc(d.dueText)}</span>` : ""}</td>${offices.map(o => cell(o, d)).join("")}<td class="cnt"><b>${p.st.g}</b> / ${N}</td></tr>`; }).join("")).join("")}
     </tbody><tfoot><tr><td class="rq muted">Delivered per office</td>${offices.map(o => `<td class="cnt cf" data-tip="${esc(o.c.l)}: ${o.n.yes} of ${DLV.length} delivered">${o.n.yes}</td>`).join("")}<td class="cnt">of ${DLV.length}</td></tr></tfoot></table></div>
     <div class="legend" style="margin-top:8px"><span><i class="dot" style="background:var(--green)"></i>✓ Delivered</span><span><i class="dot" style="background:var(--amber)"></i>½ Partially</span><span><i class="dot" style="background:var(--red)"></i>✗ Not yet</span><span><i class="dot" style="background:var(--empty);outline:1px solid var(--line)"></i>Not reported</span><span><i class="dot" style="background:var(--surface);outline:2px solid var(--red)"></i>Overdue</span></div></div>
+  ${dlvByLead(offices)}
   <div class="panel" style="margin-top:16px"><h2>Deliverables, least delivered first</h2><p class="sub">How many of the ${N} offices have delivered each one, with its due date. Use it to follow up with function leads.</p>
     <div class="dlb"><div class="dlb-row dlb-h"><span>Deliverable</span><span>Lead</span><span>Offices</span><span>Delivered</span><span>Due date</span></div>
     ${per.slice().sort((p, q) => p.rate - q.rate || q.st.r - p.st.r).map(p => `<div class="dlb-row"><span class="dlb-l" title="${esc(p.d.t)}"><span class="mono">${p.d.id.replace("_", "-")}</span> ${esc(p.d.t)}</span><span class="dlb-lead"><span class="tag">${esc(p.d.lead)}</span></span>${hbar(p.st, p.d.t, p.d.t)}<span><b class="pill ${p.rate >= .75 ? "g" : p.rate >= .38 ? "a" : "r"}">${p.st.g}/${N}</b></span><span class="dlb-due">${dueCell(p)}</span></div>`).join("")}</div>
@@ -1100,7 +1157,7 @@ function makeDummy(years){
           const v = base + slope * yi + adj + (rnd() - 0.5) * 1.3;
           const sc = rnd() < 0.04 ? "na" : v < 1.65 ? "1" : v < 2.45 ? "2" : "3"; a[it.id] = sc;
           if (sc !== "na" && rnd() < (sc === "3" ? 0.08 : 0.4)) a[it.id + "_comment"] = pick(DUMMY_COMMENTS[sc]);
-          if (sc === "3" && (it.linkLabel || rnd() < 0.15)) a[it.id + "_link"] = `https://npaid.sharepoint.com/sites/example-${c.v}/Shared%20Documents/${it.id}`;
+          if (sc === "3" && (it.linkLabel ? rnd() < 0.8 : rnd() < 0.15)) a[it.id + "_link"] = `https://npaid.sharepoint.com/sites/example-${c.v}/Shared%20Documents/${it.id}`;
         });
         Object.assign(a, calcSection(a, sx.code));
         a[sx.code + "_edited_by"] = "Example data"; a[sx.code + "_edited_at"] = Date.UTC(Number(y), 1 + Math.floor(rnd() * 3), 1 + Math.floor(rnd() * 27), 10);
@@ -1155,6 +1212,177 @@ function bindAdmin(){
   });
 }
 
+/* ---- exports ---- */
+function downloadCsv(name, rows){
+  const q = v => { const t = v == null ? "" : String(v); return /[",\n;]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
+  const blob = new Blob(["﻿" + rows.map(r => r.map(q).join(",")).join("\r\n")], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+function csvRequirements(){
+  const y = String(DASH.year), rows = [["Country office","Year","Status","Overall compliance %","Section","Requirement","Requirement text","Score","Document links","Comment","Last year's score"]];
+  DATA.countries.forEach(c => { const a = recFor(c.v, y); if (!a) return; const pv = recFor(c.v, String(Number(y) - 1)) || {}; const ov = calcTotals(a).overall_avg;
+    ITEMS.forEach(it => rows.push([c.l, y, statusOf(a), ov == null ? "" : Math.round(cp(ov)), secName(SECTIONS.find(s => s.code === it.code)), it.id.replace("_","-"), it.q, scoreTxt(a[it.id]).replace("–",""), String(a[it.id + "_link"] || "").split("\n").filter(Boolean).join(" | "), a[it.id + "_comment"] || "", scoreTxt(pv[it.id]).replace("–","")])); });
+  downloadCsv(`CO-requirements-${y}.csv`, rows);
+}
+function csvDeliverables(){
+  const y = String(DASH.year), rows = [["Country office","Year","Section","Deliverable","Lead","Due","Status","Overdue","Document link","Comment"]];
+  DATA.countries.forEach(c => { const a = recFor(c.v, y) || {};
+    DLV.forEach(d => rows.push([c.l, y, d.sec, d.t, d.lead, d.dueText || "", a[d.id] ? DLV_LABEL[a[d.id]] : "Not reported", isOverdue(d, y, a[d.id]) ? "Yes" : "", a[d.id + "_link"] || "", a[d.id + "_comment"] || ""])); });
+  downloadCsv(`CO-deliverables-${y}.csv`, rows);
+}
+
+/* ---- deadline countdown (1 June of the selected year) ---- */
+function deadlinePanel(y){
+  const dl = Date.UTC(Number(y), 5, 1, 23, 59), days = Math.ceil((dl - Date.now()) / 86400000);
+  const rows = DATA.countries.map(c => { const a = recFor(c.v, y); return {c, a, st: statusOf(a), done: a ? ITEMS.filter(it => answered(a, it)).length : 0}; });
+  const notStarted = rows.filter(r => r.st === "Not started"), behind = rows.filter(r => r.st === "In progress" && r.done / ITEMS.length < 0.5), open = rows.filter(r => r.st !== "Submitted");
+  if (!open.length) return `<p class="note ok">All ${DATA.countries.length} country offices have submitted their ${esc(y)} checklist.</p>`;
+  const chips = list => list.map(r => `<button class="chip-c" data-c2="${r.c.v}">${esc(r.c.l)}${r.st === "In progress" ? ` · ${pct(r.done, ITEMS.length)}%` : ""}</button>`).join("");
+  return `<div class="panel dl-count ${days < 0 ? "late" : days <= 30 ? "soon" : ""}"><div class="dl-days"><b>${days >= 0 ? days : -days}</b><span>${days >= 0 ? `day${days === 1 ? "" : "s"} to the 1 June ${esc(y)} deadline` : `day${days === -1 ? "" : "s"} past the 1 June ${esc(y)} deadline`}</span></div>
+    <div class="dl-who">${notStarted.length ? `<div><span class="muted">Not started (${notStarted.length})</span> ${chips(notStarted)}</div>` : ""}
+      ${behind.length ? `<div><span class="muted">Less than half answered (${behind.length})</span> ${chips(behind)}</div>` : ""}
+      ${!notStarted.length && !behind.length ? `<div class="muted">${open.length} office${open.length === 1 ? " is" : "s are"} in progress and more than half done.</div>` : ""}</div></div>`;
+}
+
+/* ---- country profile extras: change since last year, evidence ---- */
+function changePanel(a, prev, y){
+  if (!prev) return `<div class="panel"><h2>Changes since ${Number(y) - 1}</h2><p class="sub">No ${Number(y) - 1} assessment to compare with.</p></div>`;
+  const ch = ITEMS.filter(it => ["1","2","3"].includes(a[it.id]) && ["1","2","3"].includes(prev[it.id]) && a[it.id] !== prev[it.id]).map(it => ({it, d: Number(a[it.id]) - Number(prev[it.id])}));
+  const up = ch.filter(x => x.d > 0).sort((p, q) => q.d - p.d), down = ch.filter(x => x.d < 0).sort((p, q) => p.d - q.d);
+  const li = x => `<li><span class="mono q-id">${x.it.id.replace("_","-")}</span><div><div>${esc(x.it.q)}</div><div class="hint">${esc(secName(SECTIONS.find(s => s.code === x.it.code)))} · <span class="pill ${({"1":"r","2":"a","3":"g"})[prev[x.it.id]]}">${prev[x.it.id]}</span> → <span class="pill ${({"1":"r","2":"a","3":"g"})[a[x.it.id]]}">${a[x.it.id]}</span></div></div></li>`;
+  return `<div class="panel"><h2>Changes since ${Number(y) - 1}</h2><p class="sub">${ch.length ? `${up.length} requirement${up.length === 1 ? "" : "s"} improved, ${down.length} slipped.` : "No score changed."}</p>
+    ${down.length ? `<div class="att-h">Slipped <span class="muted">· ${down.length}</span></div><ul class="att chg-l">${down.map(li).join("")}</ul>` : ""}
+    ${up.length ? `<div class="att-h" style="margin-top:12px">Improved <span class="muted">· ${up.length}</span></div><ul class="att chg-l">${up.map(li).join("")}</ul>` : ""}</div>`;
+}
+function evidencePanel(a){
+  const st = evidenceStat(a), g = evidenceGaps(a);
+  return `<div class="panel"><h2>Evidence check</h2><p class="sub">Requirements that ask for a document and are scored 3 (fully in compliance): ${st.n ? `${st.ok} of ${st.n} have a link (${pct(st.ok, st.n)}%).` : "none scored 3 yet."}</p>
+    ${g.length ? `<ul class="att">${g.map(it => `<li class="att-a"><span class="mono q-id">${it.id.replace("_","-")}</span><div><div>${esc(it.q)}</div><div class="hint">Asked for: ${esc(it.linkLabel)}</div></div></li>`).join("")}</ul>` : st.n ? `<p class="note ok">Every requirement scored 3 that asks for a document has a link.</p>` : ""}</div>`;
+}
+
+/* ---- Document gaps: requirements without a governing document ---- */
+function viewGaps(){
+  const y = String(DASH.year), recs = DATA.countries.map(c => recFor(c.v, y)).filter(Boolean);
+  const rows = ITEMS.filter(it => it.nogov).map(it => { const st = {r:0, am:0, g:0, na:0, open:0};
+    recs.forEach(a => { const v = a[it.id]; if (v === "1") st.r++; else if (v === "2") st.am++; else if (v === "3") st.g++; else if (v === "na") st.na++; else st.open++; });
+    st.open += DATA.countries.length - recs.length; return {it, st, low: st.r + st.am}; }).sort((p, q) => q.low - p.low || q.st.r - p.st.r);
+  return `<p class="note">${rows.length} requirements have no governing document yet. Sorted by how many offices score them 1 or 2 in ${esc(y)}: these are the places where HO guidance would help most.</p>
+  <div class="panel"><div class="panel-head"><div><h2>Requirements without a governing document, ${esc(y)}</h2><p class="sub">Bars show the ${DATA.countries.length} offices by score.</p></div>${legend()}</div>
+    <div class="hb">${rows.map(r => `<div class="hb-row rqfull"><span class="hb-l"><span class="mono">${r.it.id.replace("_","-")}</span> ${esc(r.it.q)} <span class="tag">${esc(secName(SECTIONS.find(s => s.code === r.it.code)))}</span></span>${hbar(r.st, r.it.q, r.it.id)}<span class="hb-v"><b class="pill ${r.low ? (r.st.r ? "r" : "a") : "n"}">${r.low} office${r.low === 1 ? "" : "s"}</b></span></div>`).join("")}</div></div>`;
+}
+
+/* ================= PORTFOLIO VIEW + COMMENT SEARCH ================= */
+const pooled = recs => { let sum = 0, n = 0; recs.forEach(a => ITEMS.forEach(it => { const v = a[it.id]; if (v === "1" || v === "2" || v === "3") { sum += Number(v); n++; } })); return n ? sum / n : null; };
+const pooledSec = (recs, code) => { let sum = 0, n = 0; recs.forEach(a => bySec(code).forEach(it => { const v = a[it.id]; if (v === "1" || v === "2" || v === "3") { sum += Number(v); n++; } })); return n ? sum / n : null; };
+const subRecs = y => DATA.countries.map(c => recFor(c.v, String(y))).filter(a => a && a.submission_status === "submitted");
+function spark(vals){ // small line of compliance % over years, viewBox scaled to its box
+  const W = 160, H = 44, pts = vals.map((v, i) => ({v, i})).filter(p => p.v != null);
+  if (!pts.length) return `<svg viewBox="0 0 ${W} ${H}" class="spk"></svg>`;
+  const vs = pts.map(p => p.v), mid = (Math.max(...vs) + Math.min(...vs)) / 2, half = Math.max(0.2, (Math.max(...vs) - Math.min(...vs)) / 2 + 0.05);
+  const lo = mid - half, hi = mid + half;
+  const xs = i => vals.length === 1 ? W / 2 : 6 + i * (W - 12) / (vals.length - 1), ys = v => 4 + (hi - v) / (hi - lo) * (H - 8);
+  return `<svg viewBox="0 0 ${W} ${H}" class="spk" preserveAspectRatio="none" aria-hidden="true">
+    ${[2.5, 1.75].filter(t => t > lo && t < hi).map(t => `<line x1="0" x2="${W}" y1="${ys(t)}" y2="${ys(t)}" class="grid"/>`).join("")}
+    <path d="${pts.map((p, k) => `${k ? "L" : "M"}${xs(p.i).toFixed(1)},${ys(p.v).toFixed(1)}`).join(" ")}" fill="none" style="stroke:var(--accent)" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
+    ${pts.map(p => `<circle cx="${xs(p.i)}" cy="${ys(p.v)}" r="3" style="fill:var(--${({g:"green",a:"amber",r:"red"})[ragClass(p.v)] || "na"})"/>`).join("")}</svg>`;
+}
+function scatterChart(pts){ // pts: [{x:evidence%, y:compliance%, code, name}]
+  const W = 640, H = 380, L = 50, R = 24, T = 20, B = 44;
+  const xs = v => L + v / 100 * (W - L - R), ys = v => T + (100 - v) / 100 * (H - T - B);
+  // labels: right of the dot, or left near the right edge; nudge apart when they would overlap
+  const placed = [];
+  pts.slice().sort((a, b) => b.y - a.y).forEach(p => { const left = xs(p.x) > W - R - 50; let ly = ys(p.y);
+    for (let k = 0; k < 8 && placed.some(q => q.left === left && Math.abs(q.x - xs(p.x)) < 40 && Math.abs(q.ly - ly) < 12); k++) ly += 12;
+    placed.push({x: xs(p.x), ly, left}); p.lx = left ? xs(p.x) - 10 : xs(p.x) + 10; p.ly = ly; p.anchor = left ? "end" : "start"; });
+  return `<svg viewBox="0 0 ${W} ${H}" class="lc sc" role="img" aria-label="Compliance against evidence by office">
+    <rect x="${xs(0)}" y="${ys(100)}" width="${xs(75) - xs(0)}" height="${ys(75) - ys(100)}" style="fill:var(--amber-soft)" opacity=".7"/>
+    <text x="${xs(2)}" y="${ys(97)}" class="ax" style="font-weight:700">High score, little evidence</text>
+    ${[0, 25, 50, 75, 100].map(v => `<line x1="${L}" x2="${W - R}" y1="${ys(v)}" y2="${ys(v)}" class="grid"/><text x="${L - 8}" y="${ys(v)}" text-anchor="end" dominant-baseline="central" class="ax">${v}%</text>
+      <text x="${xs(v)}" y="${H - 22}" text-anchor="middle" class="ax">${v}%</text>`).join("")}
+    <text x="${(L + W - R) / 2}" y="${H - 4}" text-anchor="middle" class="ax">Evidence: scores of 3 with the document link asked for</text>
+    <text transform="translate(12 ${(T + H - B) / 2}) rotate(-90)" text-anchor="middle" class="ax">Overall compliance</text>
+    ${pts.map(p => `<g data-tip="${esc(p.name)}: compliance ${Math.round(p.y)}%, evidence ${Math.round(p.x)}% (${p.ok} of ${p.n})"><circle cx="${xs(p.x)}" cy="${ys(p.y)}" r="7" style="fill:var(--${({g:"green",a:"amber",r:"red"})[ragClass(1 + p.y / 50)]});stroke:var(--surface)" stroke-width="2"/>
+      <text x="${p.lx}" y="${p.ly}" text-anchor="${p.anchor}" dominant-baseline="central" class="ax sc-l">${p.code}</text></g>`).join("")}
+  </svg>`;
+}
+function timelineChart(series, y){ // series: [{label, dates:[ms], cls}]; x = weeks before/after 1 June of each series' year
+  const W = 640, H = 300, L = 44, R = 20, T = 16, B = 40, from = -20, to = 4, N = DATA.countries.length;
+  const xs = w => L + (w - from) / (to - from) * (W - L - R), ys = n => T + (N - n) / N * (H - T - B);
+  const line = sr => { const ws = sr.dates.map(d => (d - Date.UTC(sr.year, 5, 1)) / 604800000).filter(w => w <= to).sort((a, b) => a - b);
+    let k = ws.filter(w => w < from).length, d = `M${xs(from)},${ys(k)}`;
+    ws.filter(w => w >= from).forEach(w => { d += ` H${xs(w).toFixed(1)} V${ys(++k).toFixed(1)}`; });
+    const now = (Date.now() - Date.UTC(sr.year, 5, 1)) / 604800000; d += ` H${xs(Math.min(to, Math.max(from, now))).toFixed(1)}`;
+    const ex = xs(Math.min(to, Math.max(from, now))), nearEnd = ex > W - R - 70;
+    return `<path d="${d}" fill="none" class="${sr.cls}" stroke-width="2.5"/><text x="${nearEnd ? ex - 4 : ex + 4}" y="${ys(k) - 6}" text-anchor="${nearEnd ? "end" : "start"}" class="ax" style="font-weight:700">${sr.label}: ${k}</text>`; };
+  return `<svg viewBox="0 0 ${W} ${H}" class="lc" role="img" aria-label="Submissions over time">
+    ${[0, Math.round(N / 2), N].map(n => `<line x1="${L}" x2="${W - R}" y1="${ys(n)}" y2="${ys(n)}" class="grid"/><text x="${L - 8}" y="${ys(n)}" text-anchor="end" dominant-baseline="central" class="ax">${n}</text>`).join("")}
+    <line x1="${xs(0)}" x2="${xs(0)}" y1="${T}" y2="${H - B}" style="stroke:var(--red)" stroke-dasharray="4 4"/><text x="${xs(0) + 4}" y="${T + 10}" class="ax" style="fill:var(--red)">1 June</text>
+    ${[-20, -16, -12, -8, -4, 0, 4].map(w => `<text x="${xs(w)}" y="${H - 18}" text-anchor="middle" class="ax">${w === 0 ? "0" : w > 0 ? "+" + w : w}</text>`).join("")}
+    <text x="${(L + W - R) / 2}" y="${H - 2}" text-anchor="middle" class="ax">Weeks before and after the deadline</text>
+    ${series.map(line).join("")}</svg>`;
+}
+function viewPortfolio(){
+  const y = String(DASH.year), N = DATA.countries.length, recs = DATA.countries.map(c => recFor(c.v, y)).filter(Boolean);
+  const yrs = yearsAvail().filter(yy => Number(yy) <= Number(y) && subRecs(yy).length);
+  const secs = SECTIONS.map(s => { const vals = yrs.map(yy => pooledSec(subRecs(yy), s.code)); const last = vals[vals.length - 1], prev = vals.length > 1 ? vals[vals.length - 2] : null; return {s, vals, last, d: last != null && prev != null ? last - prev : null}; });
+  const ovVals = yrs.map(yy => pooled(subRecs(yy)));
+  // biggest gaps across the portfolio
+  const gaps = ITEMS.map(it => { const st = {r:0, am:0, g:0, na:0, open:0}; recs.forEach(a => { const v = a[it.id]; if (v === "1") st.r++; else if (v === "2") st.am++; else if (v === "3") st.g++; else if (v === "na") st.na++; else st.open++; }); st.open += N - recs.length; return {it, st, low: st.r + st.am}; })
+    .filter(g => g.low).sort((p, q) => q.low - p.low || q.st.r - p.st.r).slice(0, 15);
+  // scatter
+  const pts = DATA.countries.map(c => { const a = recFor(c.v, y); if (!a) return null; const ov = calcTotals(a).overall_avg, ev = evidenceStat(a); if (ov == null || !ev.n) return null;
+    return {x: ev.ok / ev.n * 100, y: cp(ov), code: (typeof iso3 === "function" ? iso3(c) : c.l.slice(0, 3)), name: c.l, ok: ev.ok, n: ev.n}; }).filter(Boolean);
+  // N/A
+  const nas = ITEMS.map(it => ({it, offs: DATA.countries.filter(c => { const a = recFor(c.v, y); return a && a[it.id] === "na"; }).map(c => c.l)})).filter(x => x.offs.length).sort((p, q) => q.offs.length - p.offs.length).slice(0, 15);
+  // timeline
+  const ser = [Number(y) - 1, Number(y)].map((yy, i) => ({year: yy, label: String(yy), cls: i ? "tl-now" : "tl-prev", dates: DATA.countries.map(c => recFor(c.v, String(yy))).filter(a => a && a.submission_status === "submitted" && a.submitted_at).map(a => Number(a.submitted_at))})).filter(sr => sr.dates.length || sr.year === Number(y));
+  return `<p class="note">The whole portfolio at a glance. Trends use submitted checklists only; the other panels use every office's latest answers for ${esc(y)}.</p>
+  <div class="panel"><div class="panel-head"><div><h2>Compliance by section over time</h2><p class="sub">${yrs.length > 1 ? `All submitted offices pooled, ${yrs[0]}–${yrs[yrs.length - 1]}. Shaded lines mark the amber (38%) and green (75%) thresholds.` : "Trends appear once two years of submitted checklists exist."}</p></div>
+      <div class="pf-ov"><span class="muted">Overall</span><b>${fp(ovVals[ovVals.length - 1] ?? null)}</b>${ovVals.length > 1 && ovVals[ovVals.length - 1] != null && ovVals[ovVals.length - 2] != null ? dArrow(ovVals[ovVals.length - 1] - ovVals[ovVals.length - 2]) : ""}</div></div>
+    <div class="pf-grid">${secs.map(x => `<div class="pf-card" data-tip="${esc(secName(x.s))}: ${yrs.map((yy, i) => `${yy} ${fp(x.vals[i] ?? null)}`).join(" · ")}"><div class="pf-t">${esc(secName(x.s))}</div><div class="pf-v"><b class="c-txt-${ragClass(x.last)}">${fp(x.last ?? null)}</b>${x.d != null ? dArrow(x.d) : ""}</div>${spark(x.vals)}</div>`).join("")}</div></div>
+  <div class="two" style="margin-top:16px">
+    <div class="panel"><h2>Self-assessment and evidence</h2><p class="sub">Each dot is an office. Offices in the shaded corner score themselves high but have few of the document links asked for.</p>
+      ${pts.length ? scatterChart(pts) : `<p class="muted">No office has scored a requirement that asks for a document as 3 yet.</p>`}</div>
+    <div class="panel"><h2>Submissions towards 1 June</h2><p class="sub">Cumulative number of offices that submitted, ${ser.map(sr => sr.year).join(" compared with ")}.</p>
+      ${timelineChart(ser, y)}<div class="legend"><span><i class="dot" style="background:var(--accent)"></i>${esc(y)}</span>${ser.length > 1 ? `<span><i class="dot" style="background:var(--na)"></i>${Number(y) - 1}</span>` : ""}</div></div>
+  </div>
+  <div class="panel" style="margin-top:16px"><div class="panel-head"><div><h2>Biggest gaps across the portfolio, ${esc(y)}</h2><p class="sub">The 15 requirements most often scored 1 or 2, all sections together.</p></div>${legend()}</div>
+    <div class="hb">${gaps.map(g => `<div class="hb-row rqfull"><span class="hb-l"><span class="mono">${g.it.id.replace("_","-")}</span> ${esc(g.it.q)} <span class="tag">${esc(secName(SECTIONS.find(s => s.code === g.it.code)))}</span></span>${hbar(g.st, g.it.q, g.it.id)}<span class="hb-v"><b class="pill ${g.st.r ? "r" : "a"}">${g.low} office${g.low === 1 ? "" : "s"}</b></span></div>`).join("") || `<p class="muted">No requirement scored 1 or 2 yet.</p>`}</div></div>
+  <div class="panel" style="margin-top:16px"><h2>Most often marked N/A, ${esc(y)}</h2><p class="sub">A requirement many offices mark N/A may not fit some contexts, or N/A may be used instead of a low score. Useful input for the next review of the list.</p>
+    ${nas.length ? `<div class="hb">${nas.map(x => `<div class="hb-row rqfull"><span class="hb-l"><span class="mono">${x.it.id.replace("_","-")}</span> ${esc(x.it.q)} <span class="tag">${esc(secName(SECTIONS.find(s => s.code === x.it.code)))}</span></span><div class="hb-bar" data-tip="${esc(x.offs.join(", "))}"><i style="flex:${x.offs.length};background:var(--na)"></i><i style="flex:${N - x.offs.length};background:var(--empty)"></i></div><span class="hb-v"><b class="pill n">${x.offs.length} office${x.offs.length === 1 ? "" : "s"}</b></span></div>`).join("")}</div>` : `<p class="muted">No requirement is marked N/A in ${esc(y)}.</p>`}</div>`;
+}
+function viewComments(){
+  return `<div class="panel"><h2>Search comments</h2><p class="sub">Every comment country offices wrote on requirements and deliverables, and the Country Directors' overall comments, for ${esc(String(DASH.year))}.</p>
+    <div class="cm-bar"><div class="fld"><label for="cm-q">Search</label><input id="cm-q" type="search" value="${esc(DASH.cq || "")}" placeholder="For example: audit, insurance, Soliday"></div>
+      <div class="fld"><label for="cm-sec">Section</label><select id="cm-sec"><option value="">All sections</option>${SECTIONS.map(x => `<option value="${x.code}" ${DASH.csec === x.code ? "selected" : ""}>${esc(secName(x))}</option>`).join("")}<option value="DLV" ${DASH.csec === "DLV" ? "selected" : ""}>Deliverables</option><option value="CD" ${DASH.csec === "CD" ? "selected" : ""}>Country Director's comment</option></select></div></div>
+    <div id="cm-res"></div></div>`;
+}
+function commentRows(){
+  const y = String(DASH.year), q = (DASH.cq || "").trim().toLowerCase(), sec = DASH.csec || "", out = [];
+  DATA.countries.forEach(c => { const a = recFor(c.v, y); if (!a) return;
+    if (!sec || SECTIONS.some(x => x.code === sec)) ITEMS.forEach(it => { if (sec && it.code !== sec) return; const t = a[it.id + "_comment"]; if (t) out.push({c, id: it.id.replace("_","-"), what: it.q, t, sc: a[it.id]}); });
+    if (!sec || sec === "DLV") DLV.forEach(d => { const t = a[d.id + "_comment"]; if (t) out.push({c, id: d.id.replace("_","-"), what: d.t, t, dl: a[d.id]}); });
+    if ((!sec || sec === "CD") && a.cd_comment) out.push({c, id: "CD", what: "Country Director's overall comment", t: a.cd_comment}); });
+  return q ? out.filter(r => (r.t + " " + r.what + " " + r.c.l).toLowerCase().includes(q)) : out;
+}
+function drawComments(){
+  const box = document.getElementById("cm-res"); if (!box) return;
+  const rows = commentRows(), q = (DASH.cq || "").trim(), shown = rows.slice(0, 200);
+  const hi = t => { const e = esc(t); if (!q) return e; const i = e.toLowerCase().indexOf(esc(q).toLowerCase()); return i < 0 ? e : e.slice(0, i) + "<mark>" + e.slice(i, i + esc(q).length) + "</mark>" + e.slice(i + esc(q).length); };
+  box.innerHTML = `<p class="muted" style="margin:10px 0">${rows.length} comment${rows.length === 1 ? "" : "s"}${q ? ` matching “${esc(q)}”` : ""}${rows.length > 200 ? " · showing the first 200" : ""}</p>
+    <ul class="att cm-l">${shown.map(r => `<li class="${r.sc === "1" ? "att-r" : r.sc === "2" ? "att-a" : ""}"><span class="mono q-id">${r.id}</span><div><div><b>${esc(r.c.l)}</b>${r.sc ? ` <span class="pill ${({"1":"r","2":"a","3":"g"})[r.sc] || "n"}">${scoreTxt(r.sc)}</span>` : r.dl ? ` <span class="pill ${({yes:"g",partially:"a",no:"r"})[r.dl]}">${esc(DLV_LABEL[r.dl])}</span>` : ""} <span class="muted">· ${esc(r.what.length > 90 ? r.what.slice(0, 88) + "…" : r.what)}</span></div><div class="cm-t">${hi(r.t)}</div></div></li>`).join("")}</ul>`;
+}
+function dlvByLead(offices){
+  const N = DATA.countries.length, leads = [...new Set(DLV.map(d => d.lead))];
+  const rows = leads.map(l => { const ds = DLV.filter(d => d.lead === l), st = {r:0, am:0, g:0, na:0, open:0};
+    ds.forEach(d => offices.forEach(o => { const v = o.a ? o.a[d.id] : null; if (v === "yes") st.g++; else if (v === "partially") st.am++; else if (v === "no") st.r++; else st.open++; }));
+    return {l, n: ds.length, st, rate: st.g / (ds.length * N)}; }).sort((p, q) => p.rate - q.rate);
+  return `<div class="panel" style="margin-top:16px"><h2>Delivery by HO lead</h2><p class="sub">All offices' deliverables grouped by the HO unit that leads them, lowest delivery first. A list for each function lead to follow up.</p>
+    <div class="hb">${rows.map(r => `<div class="hb-row"><span class="hb-l">${esc(r.l)} <span class="muted">· ${r.n} deliverable${r.n === 1 ? "" : "s"}</span></span>${hbar(r.st, r.l, r.l)}<span class="hb-v"><b class="pill ${r.rate >= .75 ? "g" : r.rate >= .38 ? "a" : "r"}">${Math.round(r.rate * 100)}%</b></span></div>`).join("")}</div>
+    <div class="legend" style="margin-top:8px"><span><i class="dot" style="background:var(--green)"></i>Delivered</span><span><i class="dot" style="background:var(--amber)"></i>Partially</span><span><i class="dot" style="background:var(--red)"></i>Not yet</span><span><i class="dot" style="background:var(--empty);outline:1px solid var(--line)"></i>Not reported</span></div></div>`;
+}
+
 /* ---- views ---- */
 function renderDash(){
   const root = $app();
@@ -1162,12 +1390,13 @@ function renderDash(){
   if (DASH.error) { if (DASH.error.auth) { renderSignIn(DASH.error.message, true); return; } root.innerHTML = `<div class="card"><div class="eyebrow">Dashboards</div><h1>The dashboard could not load</h1><p class="note err">${esc(DASH.error.message)}</p><div><button class="btn" id="d-retry">Try again</button></div></div>`; document.getElementById("d-retry").onclick = () => { DASH.error = null; DASH.data = null; renderDash(); }; return; }
   if (!DASH.country) DASH.country = (APP.country && DATA.countries.some(c => c.v === APP.country)) ? APP.country : DATA.countries[0].v;
   const years = yearsAvail();
-  const body = DASH.mode === "overview" ? viewOverview() : DASH.mode === "country" ? viewCountry() : DASH.mode === "section" ? viewSection() : DASH.mode === "dlv" ? viewDeliverables() : viewTrend();
+  const body = DASH.mode === "overview" ? viewOverview() : DASH.mode === "country" ? viewCountry() : DASH.mode === "section" ? viewSection() : DASH.mode === "dlv" ? viewDeliverables() : DASH.mode === "gaps" ? viewGaps() : DASH.mode === "portfolio" ? viewPortfolio() : DASH.mode === "comments" ? viewComments() : viewTrend();
   root.innerHTML = `
-    <div class="dash-head"><div><div class="eyebrow">Dashboards${DEMO ? " · example data" : ""}</div><h1>${DASH.mode === "overview" ? "All country offices" : DASH.mode === "country" ? "Country office profile" : DASH.mode === "section" ? "By section" : DASH.mode === "dlv" ? "Deliverables" : "Progress over time"}</h1></div>
-      <span class="muted" style="font-size:.8rem">${DEMO ? "Example data, not connected to ArcGIS" : `${DASH.total} record${DASH.total === 1 ? "" : "s"} loaded from ArcGIS Online`} · ${DASH.loadedAt ? new Date(DASH.loadedAt).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) : ""} · <button class="linkbtn" id="d-refresh" style="color:var(--accent)">Refresh</button></span></div>
+    <div class="dash-head"><div><div class="eyebrow">Dashboards${DEMO ? " · example data" : ""}</div><h1>${DASH.mode === "overview" ? "All country offices" : DASH.mode === "country" ? "Country office profile" : DASH.mode === "section" ? "By section" : DASH.mode === "dlv" ? "Deliverables" : DASH.mode === "gaps" ? "Requirements without a governing document" : DASH.mode === "portfolio" ? "Portfolio overview" : DASH.mode === "comments" ? "Comments" : "Progress over time"}</h1></div>
+      <span class="muted" style="font-size:.8rem">${DEMO ? "Example data, not connected to ArcGIS" : `${DASH.total} record${DASH.total === 1 ? "" : "s"} loaded from ArcGIS Online`} · ${DASH.loadedAt ? new Date(DASH.loadedAt).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) : ""} · <button class="linkbtn" id="d-refresh" style="color:var(--accent)">Refresh</button>
+        <span class="dl-btns"><button class="btn" id="d-print">Print or save as PDF</button><button class="btn" id="d-csv">Download requirements (Excel)</button><button class="btn" id="d-csv2">Download deliverables (Excel)</button></span></span></div>
     <div class="filters">
-      <div class="seg" role="group" aria-label="View">${[["overview","All offices"],["country","Country profile"],["section","By section"],["trend","Trends"],["dlv","Deliverables"]].map(([k, l]) => `<button data-mode="${k}" aria-pressed="${DASH.mode === k}">${l}</button>`).join("")}</div>
+      <div class="seg" role="group" aria-label="View">${[["overview","All offices"],["country","Country profile"],["section","By section"],["trend","Trends"],["dlv","Deliverables"],["gaps","Document gaps"],["portfolio","Portfolio"],["comments","Comments"]].map(([k, l]) => `<button data-mode="${k}" aria-pressed="${DASH.mode === k}">${l}</button>`).join("")}</div>
       ${DASH.mode === "section" ? `<div class="fld"><label for="d-section">Section</label><select id="d-section">${SECTIONS.map(x => `<option value="${x.code}" ${x.code === (DASH.section || SECTIONS[0].code) ? "selected" : ""}>${esc(secName(x))}</option>`).join("")}</select></div>` : ""}
       ${DASH.mode === "country" || DASH.mode === "trend" ? `<div class="fld"><label for="d-country">Country office</label><select id="d-country">${DATA.countries.map(c => `<option value="${c.v}" ${c.v === DASH.country ? "selected" : ""}>${esc(c.l)}</option>`).join("")}</select></div>` : ""}
       ${DASH.mode !== "trend" ? `<div class="fld"><label for="d-year">Year</label><select id="d-year">${years.map(y => `<option ${y === String(DASH.year) ? "selected" : ""}>${y}</option>`).join("")}</select></div>` : ""}
@@ -1176,9 +1405,15 @@ function renderDash(){
     ${(DASH.data || []).some(isDummy) ? `<p class="note warn">These dashboards include example data for demonstration (marked "Example data"). It will be removed before the tool goes live.</p>` : ""}
     ${DASH.dups && DASH.dups.length ? `<p class="note warn">Duplicate records found: ${DASH.dups.map(d => `${esc(lbl(DATA.countries, d.country))} ${esc(d.year)} (${d.n} records)`).join(", ")}. The dashboard uses the submitted one, or the most complete. Delete the extra records in ArcGIS Online (layer › Data tab) to keep things tidy.</p>` : ""}
     ${body}
-    <p class="muted" style="font-size:.78rem;margin-top:16px" ${DASH.mode === "dlv" ? "hidden" : ""}>How compliance is calculated: each requirement scored 3 (fully) counts 100%, 2 (partially) 50% and 1 (not in compliance) 0%; N/A and unanswered requirements are left out. ${THRESH}.</p>`;
+    <p class="muted" style="font-size:.78rem;margin-top:16px" ${["dlv","comments"].includes(DASH.mode) ? "hidden" : ""}>How compliance is calculated: each requirement scored 3 (fully) counts 100%, 2 (partially) 50% and 1 (not in compliance) 0%; N/A and unanswered requirements are left out. ${THRESH}.</p>`;
   root.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { DASH.mode = b.dataset.mode; dashHash(); renderDash(); });
   bindAdmin();
+  if (DASH.mode === "comments") { drawComments();
+    const cq = document.getElementById("cm-q"); if (cq) cq.oninput = () => { DASH.cq = cq.value; drawComments(); };
+    const cs = document.getElementById("cm-sec"); if (cs) cs.onchange = () => { DASH.csec = cs.value; drawComments(); }; }
+  const pr = document.getElementById("d-print"); if (pr) pr.onclick = () => window.print();
+  const c1 = document.getElementById("d-csv"); if (c1) c1.onclick = () => csvRequirements();
+  const c2 = document.getElementById("d-csv2"); if (c2) c2.onclick = () => csvDeliverables();
   const on = (id, fn) => { const el = document.getElementById(id); if (el) el.onchange = fn; };
   on("d-country", e => { DASH.country = e.target.value; renderDash(); });
   on("d-year", e => { DASH.year = e.target.value; renderDash(); });
@@ -1198,16 +1433,19 @@ function viewOverview(){
   let s = 0, n = 0, reds = 0; sub.forEach(r => { const t = r.t; s += t.total_red + t.total_amber * 2 + t.total_green * 3; n += t.total_red + t.total_amber + t.total_green; reds += t.total_red; });
   const avg = n ? s / n : null;
   rows.sort((a, b) => (a.ov ?? 9) - (b.ov ?? 9));
-  return `<div class="kpis">
+  rows.forEach(r => { const pa = recFor(r.c.v, String(Number(y) - 1)), pv = pa ? calcTotals(pa).overall_avg : null; r.delta = (r.ov != null && pv != null) ? r.ov - pv : null; r.ev = r.a ? evidenceStat(r.a) : null; });
+  return `${deadlinePanel(y)}<div class="kpis">
       <div class="kpi"><span class="l">Submitted to HO</span><span class="v">${sub.length}<small> / ${DATA.countries.length}</small></span><span class="s">${prog.length} in progress · ${DATA.countries.length - sub.length - prog.length} not started</span></div>
       <div class="kpi"><span class="l">Average compliance, submitted offices</span><span class="v">${fp(avg)}</span><span class="s">${avg != null ? `<span class="pill ${ragClass(avg)}">${rag(avg)}</span>` : "no submissions yet"}</span></div>
       <div class="kpi"><span class="l">Requirements not in compliance</span><span class="v">${reds}</span><span class="s">scored 1 across submitted offices</span></div>
       <div class="kpi"><span class="l">Offices with a red overall score</span><span class="v">${sub.filter(r => rag(r.ov) === "Red").length}</span><span class="s">overall compliance below 38%</span></div>
     </div>
     <div class="panel"><div class="panel-head"><div><h2>Compliance by section, ${esc(y)}</h2><p class="sub">Lowest overall first. Select a country to open its profile. ${THRESH}.</p></div></div>
-    <div class="hm-scroll"><table class="hm"><thead><tr><th class="cn">Country office</th><th>Overall</th>${SECTIONS.map(s => `<th title="${esc(secName(s))}">${s.num}<span class="full">${esc(s.name.replace(" management","").replace("Staff and Management Support","Staff & Mgmt"))}</span></th>`).join("")}</tr></thead>
+    <div class="hm-scroll"><table class="hm"><thead><tr><th class="cn">Country office</th><th>Overall</th><th title="Change in overall compliance since last year">vs ${Number(y) - 1}</th><th title="Requirements scored 3 that ask for a document: share with a link">Evidence</th>${SECTIONS.map(s => `<th title="${esc(secName(s))}">${s.num}<span class="full">${esc(s.name.replace(" management","").replace("Staff and Management Support","Staff & Mgmt"))}</span></th>`).join("")}</tr></thead>
     <tbody>${rows.map(r => `<tr data-c="${r.c.v}"><td class="cname">${esc(r.c.l)}${r.st !== "Submitted" ? `<span class="st">${r.st.toLowerCase()}</span>` : ""}</td>
       <td class="c-${ragClass(r.ov)} ov" data-tip="${esc(r.c.l)}: overall compliance ${r.ov != null ? fp(r.ov) : "no data"}">${fp(r.ov)}</td>
+      <td class="dcol">${r.delta != null ? dArrow(r.delta) : `<span class="muted">–</span>`}</td>
+      <td class="dcol" data-tip="${r.ev && r.ev.n ? `${esc(r.c.l)}: ${r.ev.ok} of ${r.ev.n} requirements scored 3 that ask for a document have a link` : "No requirement asking for a document is scored 3 yet"}">${r.ev && r.ev.n ? `<span class="${r.ev.ok < r.ev.n ? "ev-low" : ""}">${pct(r.ev.ok, r.ev.n)}%</span>` : `<span class="muted">–</span>`}</td>
       ${SECTIONS.map(s => { const st = r.a ? calcSection(r.a, s.code) : null, v = st ? st[s.code + "_avg"] : null; return `<td class="c-${ragClass(v)}" data-tip="${esc(r.c.l)} · ${esc(secName(s))}: ${v != null ? fp(v) + ` compliance (${st[s.code+"_red"]} red, ${st[s.code+"_amber"]} amber, ${st[s.code+"_green"]} green)` : "not answered"}">${fp(v)}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div></div>`;
 }
 
@@ -1238,6 +1476,7 @@ function viewCountry(){
           return `<div class="att-sec"><div class="att-h">${esc(secName(s))} <span class="muted">· ${its.length}</span></div><ul class="att">${its.map(it => `<li class="att-${k}"><span class="mono q-id">${it.id.replace("_","-")}</span><div><div>${esc(it.q)}</div>${a[it.id + "_comment"] ? `<div class="hint">“${esc(a[it.id + "_comment"])}”</div>` : ""}</div></li>`).join("")}</ul></div>`; }).join("") : `<p class="muted">No requirements scored ${sc}.</p>`}</div>`).join("")}
       </div>
     </div>
+    <div class="two" style="margin-top:16px">${changePanel(a, prev, y)}${evidencePanel(a)}</div>
     <div class="panel" style="margin-top:16px"><div class="panel-head"><div><h2>Scores by section</h2><p class="sub">Each ring shows the share of the section's requirements by score; the percentage is the section's compliance.</p></div>${legend()}</div>
       <div class="sec-grid">${SECTIONS.map(s => { const st = calcSection(a, s.code), m = bySec(s.code).length, v = st[s.code+"_avg"], ps = prev ? calcSection(prev, s.code)[s.code+"_avg"] : null, d = (v != null && ps != null) ? v - ps : null;
         return `<div class="sec-card">${donut(segsOf({r:st[s.code+"_red"], am:st[s.code+"_amber"], g:st[s.code+"_green"], na:st[s.code+"_na"]}, secName(s)), m, 92, 14, fp(v))}
